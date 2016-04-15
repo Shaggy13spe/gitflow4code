@@ -34,9 +34,9 @@ export function activate(context: vscode.ExtensionContext) {
             
             outChannel.clear();
             if(item.label === itemPickList[0].label)
-                
+                vscode.window.showInputBox({ prompt: 'Name of Feature: ' }).then(val => featureCommands.runStartFeature(outChannel, val));
             else
-                vscode.window.showInformationMessage('Finishing Feature');
+                featureCommands.runFinishFeature(outChannel);
             
         });
         

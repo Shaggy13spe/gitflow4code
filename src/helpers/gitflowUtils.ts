@@ -123,10 +123,10 @@ export function getStatus(rootDir) {
         return new Promise(function (resolve, reject) {
             let options = { cwd: rootDir };
             let util = require('util');
-            let spawn = require('chile_process').spawn;
+            let spawn = require('child_process').spawn;
             let ls = spawn(gitExecutable, ['status'], options);
-            let log = "";
-            let error = "";
+            let log = '';
+            let error = '';
             ls.stdout.on('data', function (data) {
                 log += data + '\n';
             });
@@ -144,3 +144,27 @@ export function getStatus(rootDir) {
     });
 }
 
+export function startFeature(rootDir, featureName) {
+    return getGitPath().then(function (gitExecutable) {
+        return new Promise(function (resolve, reject) {
+            let options = { cwd: rootDir };
+            let spawn = require('child_process').spawn;
+            let ls = spawn(gitExecutable, ['flow', 'feature', 'start', featureName], options);
+            let log = '';
+            let error = '';
+            ls.stdout.on('data', function (data) {
+                log += data + '\n';
+            });
+            ls.stderr.on('data', function (data) {
+                error += data;
+            });
+            ls.on('exit', function (data) {
+                if(error.length > 0) {
+                    reject(error);
+                    return;
+                }
+                resolve(log);
+            });
+        });
+    });
+}
