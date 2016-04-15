@@ -1,0 +1,43 @@
+{
+    "name": "gitflow4code",
+    "displayName": "GitFlow 4 Code",
+    "description": "Adds GitFlow support to VS Code",
+    "version": "0.0.1",
+    "publisher": "michaelmorrison",
+    "license": "SEE LICENSE IN LICENSE or README.MD",
+    "homepage": "https://github.com/michaelmorrison/gitflow4code/blob/master/README.md",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/michaelmorrison/gitflow4code/"
+    },
+    "icon": "images/icon.png",
+    "galleryBanner": {
+        "color": "#0000FF",
+        "theme": "dark"
+    },
+    "engines": {
+        "vscode": "^0.10.10"
+    },
+    "categories": [
+        "Other"
+    ],
+    "activationEvents": [
+        "onCommand:gitflow.GitFlow"
+    ],
+    "main": "./out/src/gitflow",
+    "contributes": {
+        "commands": [{
+            "command": "gitflow.GitFlow",
+            "title": "GitFlow: Run GitFlow commands"
+        }]
+    },
+    "scripts": {
+        "vscode:prepublish": "node ./node_modules/vscode/bin/compile",
+        "compile": "node ./node_modules/vscode/bin/compile -watch -p ./",
+        "postinstall": "node ./node_modules/vscode/bin/install"
+    },
+    "devDependencies": {
+        "typescript": "^1.8.5",
+        "vscode": "^0.11.0"
+    }
+}
