@@ -168,3 +168,54 @@ export function startFeature(rootDir, featureName) {
         });
     });
 }
+
+export function finishFeature(rootDir, featureName) {
+    return getGitPath().then(function (gitExecutable) {
+        return new Promise(function (resolve, reject) {
+            let options = { cwd: rootDir };
+            let spawn = require('child_process').spawn;
+            let ls = spawn(gitExecutable, ['flow', 'feature', 'finish', featureName], options);
+            let log = '';
+            let error = '';
+            ls.stdout.on('data', function (data) {
+                log += data + '\n';
+            });
+            ls.stderr.on('data', function (data) {
+                error += data;
+            });
+            ls.on('exit', function (data) {
+                if(error.length > 0) {
+                    reject(error);
+                    return;
+                }
+                resolve(log);
+            });
+        });
+    });
+}
+
+export function getCurrentBranchName(rootDir) {
+    return getGitPath().then(function (gitExecutable) {
+        return new Promise(function (resolve, reject) {
+            var options = { cwd: rootDir };
+            var util = require('util');
+            var spawn = require('child_process').spawn;
+            var ls = spawn(gitExecutable, ['rev-parse', '--abbrev-ref', 'HEAD'], options);
+            var log = '';
+            var error = '';
+            ls.stdout.on('data', function (data) {
+                log += data + '\n';
+            });
+            ls.stderr.on('data', function (data) {
+                error += data;
+            });
+            ls.on('exit', function (data) {
+                if (error.length > 0) {
+                    reject(error);
+                    return;
+                }
+                resolve(log);
+            });
+        });
+    });
+}

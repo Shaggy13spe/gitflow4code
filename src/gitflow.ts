@@ -21,12 +21,16 @@ export function activate(context: vscode.ExtensionContext) {
         // The code you place here will be executed every time your command is executed
         var itemPickList = [
             { 
-                label: "Start Feature",
-                description: ""
+                label: "Features",
+                description: "Commands for managing git-flow features"
             },
             {
-                label: "Finish Feature",
-                description: ""
+                label: "Releases",
+                description: "Commands for managing git-flow releases"
+            },
+            {
+                label: "Hotfixes",
+                description: "Commands for managing git-flow hotfixes"
             }
         ];
         vscode.window.showQuickPick(itemPickList).then(function(item) {
@@ -34,9 +38,7 @@ export function activate(context: vscode.ExtensionContext) {
             
             outChannel.clear();
             if(item.label === itemPickList[0].label)
-                vscode.window.showInputBox({ prompt: 'Name of Feature: ' }).then(val => featureCommands.runStartFeature(outChannel, val));
-            else
-                featureCommands.runFinishFeature(outChannel);
+                featureCommands.run(outChannel);
             
         });
         
