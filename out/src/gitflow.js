@@ -5,6 +5,7 @@ var vscode = require('vscode');
 var featureCommands = require('./commands/features');
 var releaseCommands = require('./commands/releases');
 var hotfixCommands = require('./commands/hotfixes');
+var gitCommands = require('./commands/gitCommands');
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 function activate(context) {
@@ -30,6 +31,10 @@ function activate(context) {
             {
                 label: "Hotfixes",
                 description: "Commands for managing git-flow hotfixes"
+            },
+            {
+                label: "Get Status",
+                description: "Runs git status on command line"
             }
         ];
         vscode.window.showQuickPick(itemPickList).then(function (item) {
@@ -47,6 +52,7 @@ function activate(context) {
                     hotfixCommands.run(outChannel);
                     break;
                 default:
+                    gitCommands.run(outChannel);
                     break;
             }
         });

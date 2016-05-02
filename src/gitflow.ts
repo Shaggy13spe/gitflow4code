@@ -5,6 +5,7 @@ import * as vscode from 'vscode';
 import * as featureCommands from './commands/features';
 import * as releaseCommands from './commands/releases';
 import * as hotfixCommands from './commands/hotfixes';
+import * as gitCommands from './commands/gitCommands';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -33,6 +34,10 @@ export function activate(context: vscode.ExtensionContext) {
             {
                 label: "Hotfixes",
                 description: "Commands for managing git-flow hotfixes"
+            },
+            {
+                label: "Get Status",
+                description: "Runs git status on command line"
             }
         ];
         vscode.window.showQuickPick(itemPickList).then(function(item) {
@@ -50,6 +55,7 @@ export function activate(context: vscode.ExtensionContext) {
                     hotfixCommands.run(outChannel);
                     break;
                 default:
+                    gitCommands.run(outChannel);
                     break;
             }
         });

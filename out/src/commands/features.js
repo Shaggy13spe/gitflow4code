@@ -1,6 +1,7 @@
 "use strict";
 var vscode = require('vscode');
 var gitflowUtils = require('../helpers/gitflowUtils');
+var gitUtils = require('../helpers/gitUtils');
 function run(outChannel) {
     var itemPickList = [
         {
@@ -24,9 +25,7 @@ function run(outChannel) {
 }
 exports.run = run;
 function startFeature(outChannel, featureName) {
-    if (!vscode.window.activeTextEditor || !vscode.window.activeTextEditor.document)
-        return;
-    gitflowUtils.getGitRepositoryPath(vscode.window.activeTextEditor.document.fileName).then(function (gitRepositoryPath) {
+    gitUtils.getGitRepositoryPath(vscode.window.activeTextEditor.document.fileName).then(function (gitRepositoryPath) {
         gitflowUtils.startFeature(gitRepositoryPath, featureName).then(startFeature, genericErrorHandler);
         function startFeature(log) {
             if (log.length === 0) {
@@ -45,12 +44,26 @@ function startFeature(outChannel, featureName) {
                 vscode.window.showErrorMessage('There was an error, please view details in output log');
             }
         }
+    }).catch(function (error) {
+        if (error.code && error.syscall && error.code === 'ENOENT' && error.syscall === 'spawn git')
+            vscode.window.showErrorMessage('Cannot find git installation');
+        else {
+            outChannel.appendLine(error);
+            outChannel.show();
+            vscode.window.showErrorMessage('There was an error, please view details in output log');
+        }
+    }).catch(function (error) {
+        if (error.code && error.syscall && error.code === 'ENOENT' && error.syscall === 'spawn git')
+            vscode.window.showErrorMessage('Cannot find git installation');
+        else {
+            outChannel.appendLine(error);
+            outChannel.show();
+            vscode.window.showErrorMessage('There was an error, please view details in output log');
+        }
     });
 }
 function finishFeature(outChannel) {
-    if (!vscode.window.activeTextEditor || !vscode.window.activeTextEditor.document)
-        return;
-    gitflowUtils.getGitRepositoryPath(vscode.window.activeTextEditor.document.fileName).then(function (gitRepositoryPath) {
+    gitUtils.getGitRepositoryPath(vscode.window.activeTextEditor.document.fileName).then(function (gitRepositoryPath) {
         gitflowUtils.finishFeature(gitRepositoryPath).then(finishFeature, genericErrorHandler);
         function finishFeature(log) {
             if (log.length === 0) {
@@ -68,6 +81,14 @@ function finishFeature(outChannel) {
                 outChannel.show();
                 vscode.window.showErrorMessage('There was an error, please view details in output log');
             }
+        }
+    }).catch(function (error) {
+        if (error.code && error.syscall && error.code === 'ENOENT' && error.syscall === 'spawn git')
+            vscode.window.showErrorMessage('Cannot find git installation');
+        else {
+            outChannel.appendLine(error);
+            outChannel.show();
+            vscode.window.showErrorMessage('There was an error, please view details in output log');
         }
     });
 }
