@@ -222,6 +222,150 @@ export function finishFeature(rootDir) {
     });
 }
 
+export function startRelease(rootDir, releaseName) {
+    return getGitPath().then(function (gitExecutable) {
+        return new Promise(function (resolve, reject) {
+            let options = { cwd: rootDir };
+            let spawn = require('child_process').spawn;
+            let ls = spawn(gitExecutable, ['flow', 'release', 'start', releaseName], options);
+            let log = '';
+            let error = '';
+            ls.stdout.on('data', function (data) {
+                log += data + '\n';
+            });
+            ls.stderr.on('data', function (data) {
+                error += data;
+            });
+            ls.on('exit', function (data) {
+                if(error.length > 0) {
+                    reject(error);
+                    return;
+                }
+                resolve(log);
+            });
+        });
+    });
+}
+
+export function finishRelease(rootDir) {
+    return getGitPath().then(function (gitExecutable) {
+        return new Promise(function(resolve, reject) {
+            let options = { cwd: rootDir };
+            let spawn = require('child_process').spawn;
+            let ls1 = spawn(gitExecutable, ['flow', 'release', 'list'], options);
+            var branchData = '';
+            var releases = [];
+            var inRelease = false;
+            var currentBranch = '';
+            ls1.stdout.on('data', function (data) {
+                branchData += data;
+            });
+            ls1.on('exit', function(data) {
+                releases = branchData.replace(/ /g,'').trim().split('\n');
+                releases.forEach(element => {
+                    if(element.indexOf('*') === 0) {
+                        inRelease = true;
+                        currentBranch = element.substring(1);
+                        return;
+                    }
+                });
+                if(!inRelease) {
+                    reject('Not currently on a Release branch');
+                    return;
+                }
+                let ls2 = spawn(gitExecutable, ['flow', 'release', 'finish', currentBranch], options);
+                let log = '';
+                let error = '';
+                ls2.stdout.on('data', function (data) {
+                    log += data + '\n';
+                });
+                ls2.stderr.on('data', function (data) {
+                    error += data;
+                });
+                ls2.on('exit', function (data) {
+                    if(error.length > 0) {
+                        reject(error);
+                        return;
+                    }
+                    resolve(log);
+                });
+            });  
+        });
+    });
+}
+
+export function startHotfix(rootDir, hotfixName) {
+    return getGitPath().then(function (gitExecutable) {
+        return new Promise(function (resolve, reject) {
+            let options = { cwd: rootDir };
+            let spawn = require('child_process').spawn;
+            let ls = spawn(gitExecutable, ['flow', 'hotfix', 'start', hotfixName], options);
+            let log = '';
+            let error = '';
+            ls.stdout.on('data', function (data) {
+                log += data + '\n';
+            });
+            ls.stderr.on('data', function (data) {
+                error += data;
+            });
+            ls.on('exit', function (data) {
+                if(error.length > 0) {
+                    reject(error);
+                    return;
+                }
+                resolve(log);
+            });
+        });
+    });
+}
+
+export function finishHotfix(rootDir) {
+    return getGitPath().then(function (gitExecutable) {
+        return new Promise(function(resolve, reject) {
+            let options = { cwd: rootDir };
+            let spawn = require('child_process').spawn;
+            let ls1 = spawn(gitExecutable, ['flow', 'hotfix', 'list'], options);
+            var branchData = '';
+            var hotfixes = [];
+            var inHotfix = false;
+            var currentBranch = '';
+            ls1.stdout.on('data', function (data) {
+                branchData += data;
+            });
+            ls1.on('exit', function(data) {
+                hotfixes = branchData.replace(/ /g,'').trim().split('\n');
+                hotfixes.forEach(element => {
+                    if(element.indexOf('*') === 0) {
+                        inHotfix = true;
+                        currentBranch = element.substring(1);
+                        return;
+                    }
+                });
+                if(!inHotfix) {
+                    reject('Not currently on a Hotfix branch');
+                    return;
+                }
+                let ls2 = spawn(gitExecutable, ['flow', 'hotfix', 'finish', currentBranch], options);
+                let log = '';
+                let error = '';
+                ls2.stdout.on('data', function (data) {
+                    log += data + '\n';
+                });
+                ls2.stderr.on('data', function (data) {
+                    error += data;
+                });
+                ls2.on('exit', function (data) {
+                    if(error.length > 0) {
+                        reject(error);
+                        return;
+                    }
+                    resolve(log);
+                });
+            });  
+        });
+    });
+}
+
 function getCurrentBranchName(rootDir) {
     return getGitPath().then(function (gitExecutable) {
         return new Promise(function (resolve, reject) {

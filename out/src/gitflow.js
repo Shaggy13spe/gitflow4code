@@ -3,6 +3,8 @@
 // Import the module and reference it with the alias vscode in your code below
 var vscode = require('vscode');
 var featureCommands = require('./commands/features');
+var releaseCommands = require('./commands/releases');
+var hotfixCommands = require('./commands/hotfixes');
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 function activate(context) {
@@ -34,8 +36,19 @@ function activate(context) {
             if (!item)
                 return;
             outChannel.clear();
-            if (item.label === itemPickList[0].label)
-                featureCommands.run(outChannel);
+            switch (item.label) {
+                case itemPickList[0].label:
+                    featureCommands.run(outChannel);
+                    break;
+                case itemPickList[1].label:
+                    releaseCommands.run(outChannel);
+                    break;
+                case itemPickList[2].label:
+                    hotfixCommands.run(outChannel);
+                    break;
+                default:
+                    break;
+            }
         });
     });
     context.subscriptions.push(disposable);
