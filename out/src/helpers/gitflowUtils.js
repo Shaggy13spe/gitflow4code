@@ -157,27 +157,51 @@ function startFeature(rootDir, featureName) {
     });
 }
 exports.startFeature = startFeature;
-function finishFeature(rootDir, featureName) {
+function finishFeature(rootDir) {
     return getGitPath().then(function (gitExecutable) {
         return new Promise(function (resolve, reject) {
             var options = { cwd: rootDir };
             var spawn = require('child_process').spawn;
-            var ls = spawn(gitExecutable, ['flow', 'feature', 'finish', featureName], options);
-            var log = '';
-            var error = '';
-            ls.stdout.on('data', function (data) {
-                log += data + '\n';
+            var ls1 = spawn(gitExecutable, ['flow', 'feature', 'list'], options);
+            var branchData = '';
+            var features = [];
+            var inFeature = false;
+            var currentBranch = '';
+            ls1.stdout.on('data', function (data) {
+                branchData += data;
             });
-            ls.stderr.on('data', function (data) {
-                error += data;
-            });
-            ls.on('exit', function (data) {
-                if (error.length > 0) {
-                    reject(error);
+            ls1.on('exit', function (data) {
+                features = branchData.replace(/ /g, '').trim().split('\n');
+                features.forEach(function (element) {
+                    if (element.indexOf('*') === 0) {
+                        inFeature = true;
+                        currentBranch = element.substring(1);
+                        return;
+                    }
+                });
+                if (!inFeature) {
+                    reject('Not currently on a Feature branch');
                     return;
                 }
-                resolve(log);
+                var ls2 = spawn(gitExecutable, ['flow', 'feature', 'finish', currentBranch], options);
+                var log = '';
+                var error = '';
+                ls2.stdout.on('data', function (data) {
+                    log += data + '\n';
+                });
+                ls2.stderr.on('data', function (data) {
+                    error += data;
+                });
+                ls2.on('exit', function (data) {
+                    if (error.length > 0) {
+                        reject(error);
+                        return;
+                    }
+                    resolve(log);
+                });
             });
+            // if(inFeature) {
+            // }   
         });
     });
 }
@@ -207,5 +231,4 @@ function getCurrentBranchName(rootDir) {
         });
     });
 }
-exports.getCurrentBranchName = getCurrentBranchName;
 //# sourceMappingURL=gitflowUtils.js.map

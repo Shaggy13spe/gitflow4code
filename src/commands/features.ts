@@ -57,32 +57,15 @@ function finishFeature(outChannel) {
         return;
         
     gitflowUtils.getGitRepositoryPath(vscode.window.activeTextEditor.document.fileName).then(function (gitRepositoryPath) {
-        gitflowUtils.getCurrentBranchName(gitRepositoryPath).then(getCurrentBranch, genericErrorHandler);
-        function getCurrentBranch(branch) {
-            if(branch.length === 0) {
-                vscode.window.showInformationMessage('Could not get current branch name');
+        gitflowUtils.finishFeature(gitRepositoryPath).then(finishFeature, genericErrorHandler);
+        function finishFeature(log) {
+            if(log.length === 0) {
+                vscode.window.showInformationMessage('Nothing to show');
                 return;
             }
-             
-            gitflowUtils.finishFeature(gitRepositoryPath, branch).then(finishFeature, genericErrorHandler);
-            function finishFeature(log) {
-                if(log.length === 0) {
-                    vscode.window.showInformationMessage('Nothing to show');
-                    return;
-                }
-                
-                outChannel.append(log);
-                outChannel.show();
-            }
-            function genericErrorHandler(error) {
-                if(error.code && error.syscall && error.code === 'ENOENT' && error.syscall === 'spawn git')
-                    vscode.window.showErrorMessage('Cannot find git installation');
-                else {
-                    outChannel.appendLine(error);
-                    outChannel.show();
-                    vscode.window.showErrorMessage('There was an error, please view details in output log');
-                }
-            } 
+            
+            outChannel.append(log);
+            outChannel.show();
         }
         function genericErrorHandler(error) {
             if(error.code && error.syscall && error.code === 'ENOENT' && error.syscall === 'spawn git')

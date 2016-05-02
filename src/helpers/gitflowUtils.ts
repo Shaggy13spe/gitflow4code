@@ -169,32 +169,60 @@ export function startFeature(rootDir, featureName) {
     });
 }
 
-export function finishFeature(rootDir, featureName) {
+export function finishFeature(rootDir) {
     return getGitPath().then(function (gitExecutable) {
-        return new Promise(function (resolve, reject) {
+        return new Promise(function(resolve, reject) {
             let options = { cwd: rootDir };
             let spawn = require('child_process').spawn;
-            let ls = spawn(gitExecutable, ['flow', 'feature', 'finish', featureName], options);
-            let log = '';
-            let error = '';
-            ls.stdout.on('data', function (data) {
-                log += data + '\n';
+            let ls1 = spawn(gitExecutable, ['flow', 'feature', 'list'], options);
+            var branchData = '';
+            var features = [];
+            var inFeature = false;
+            var currentBranch = '';
+            ls1.stdout.on('data', function (data) {
+                branchData += data;
             });
-            ls.stderr.on('data', function (data) {
-                error += data;
-            });
-            ls.on('exit', function (data) {
-                if(error.length > 0) {
-                    reject(error);
+            ls1.on('exit', function(data) {
+                features = branchData.replace(/ /g,'').trim().split('\n');
+                features.forEach(element => {
+                    if(element.indexOf('*') === 0) {
+                        inFeature = true;
+                        currentBranch = element.substring(1);
+                        return;
+                    }
+                });
+                if(!inFeature) {
+                    reject('Not currently on a Feature branch');
                     return;
                 }
-                resolve(log);
+                let ls2 = spawn(gitExecutable, ['flow', 'feature', 'finish', currentBranch], options);
+                let log = '';
+                let error = '';
+                ls2.stdout.on('data', function (data) {
+                    log += data + '\n';
+                });
+                ls2.stderr.on('data', function (data) {
+                    error += data;
+                });
+                ls2.on('exit', function (data) {
+                    if(error.length > 0) {
+                        reject(error);
+                        return;
+                    }
+                    resolve(log);
+                });
             });
+           
+            // if(inFeature) {
+                
+            // }   
         });
+       
+            
     });
 }
 
-export function getCurrentBranchName(rootDir) {
+function getCurrentBranchName(rootDir) {
     return getGitPath().then(function (gitExecutable) {
         return new Promise(function (resolve, reject) {
             var options = { cwd: rootDir };
@@ -219,3 +247,4 @@ export function getCurrentBranchName(rootDir) {
         });
     });
 }
+
