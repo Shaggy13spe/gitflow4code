@@ -1,5 +1,4 @@
 # README
-===============================================================================================
 ## gitflow4code
 This is a Visual Studio Code extension that adds support for git-flow
 
