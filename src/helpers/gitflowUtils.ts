@@ -5,9 +5,20 @@ import * as child_process_1 from 'child_process';
 import * as fs from 'fs';
 import * as gitUtils from '../helpers/gitUtils';
 
+/*
+A branch name can not:
+    - Have a path component that begins with "."
+    - Have a double dot ".."
+    - Have an ASCII control character, "~", "^", ":" or SP, anywhere
+    - End with a "/"
+    - End with ".lock"
+    - Contain a "\" (backslash
+*/
+
 export function startFeature(rootDir, featureName) {
     return gitUtils.getGitPath().then(function (gitExecutable) {
         return new Promise(function (resolve, reject) {
+            featureName = featureName.replace(/ /g, '_');
             let options = { cwd: rootDir };
             let spawn = require('child_process').spawn;
             let ls = spawn(gitExecutable, ['flow', 'feature', 'start', featureName], options);
@@ -88,6 +99,7 @@ export function finishFeature(rootDir) {
 export function startRelease(rootDir, releaseName) {
     return gitUtils.getGitPath().then(function (gitExecutable) {
         return new Promise(function (resolve, reject) {
+            releaseName = releaseName.replace(/ /g, '_');
             let options = { cwd: rootDir };
             let spawn = require('child_process').spawn;
             let ls = spawn(gitExecutable, ['flow', 'release', 'start', releaseName], options);
@@ -168,6 +180,7 @@ export function finishRelease(rootDir) {
 export function startHotfix(rootDir, hotfixName) {
     return gitUtils.getGitPath().then(function (gitExecutable) {
         return new Promise(function (resolve, reject) {
+            hotfixName = hotfixName.replace(/ /g, '_');
             let options = { cwd: rootDir };
             let spawn = require('child_process').spawn;
             let ls = spawn(gitExecutable, ['flow', 'hotfix', 'start', hotfixName], options);
