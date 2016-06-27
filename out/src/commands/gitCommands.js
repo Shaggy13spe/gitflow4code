@@ -4,7 +4,7 @@ var gitUtils = require('../helpers/gitUtils');
 function run(outChannel) {
     if (!vscode.window.activeTextEditor || !vscode.window.activeTextEditor.document)
         return;
-    gitUtils.getGitRepositoryPath(vscode.window.activeTextEditor.document.fileName).then(function (gitRepositoryPath) {
+    gitUtils.getGitRepositoryPath(vscode.workspace.rootPath).then(function (gitRepositoryPath) {
         gitUtils.getStatus(gitRepositoryPath).then(showStatus, genericErrorHandler);
         function showStatus(log) {
             if (log.length === 0) {

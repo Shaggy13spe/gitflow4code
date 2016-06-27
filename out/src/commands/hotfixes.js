@@ -25,7 +25,7 @@ function run(outChannel) {
 }
 exports.run = run;
 function startHotfix(outChannel, featureName) {
-    gitUtils.getGitRepositoryPath(vscode.window.activeTextEditor.document.fileName).then(function (gitRepositoryPath) {
+    gitUtils.getGitRepositoryPath(vscode.workspace.rootPath).then(function (gitRepositoryPath) {
         gitflowUtils.startHotfix(gitRepositoryPath, featureName).then(startHotfix, genericErrorHandler);
         function startHotfix(log) {
             if (log.length === 0) {
@@ -55,7 +55,7 @@ function startHotfix(outChannel, featureName) {
     });
 }
 function finishHotfix(outChannel) {
-    gitUtils.getGitRepositoryPath(vscode.window.activeTextEditor.document.fileName).then(function (gitRepositoryPath) {
+    gitUtils.getGitRepositoryPath(vscode.workspace.rootPath).then(function (gitRepositoryPath) {
         gitflowUtils.finishHotfix(gitRepositoryPath).then(finishHotfix, genericErrorHandler);
         function finishHotfix(log) {
             if (log.length === 0) {

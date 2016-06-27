@@ -25,7 +25,7 @@ function run(outChannel) {
 }
 exports.run = run;
 function startFeature(outChannel, featureName) {
-    gitUtils.getGitRepositoryPath(vscode.window.activeTextEditor.document.fileName).then(function (gitRepositoryPath) {
+    gitUtils.getGitRepositoryPath(vscode.workspace.rootPath).then(function (gitRepositoryPath) {
         gitflowUtils.startFeature(gitRepositoryPath, featureName).then(startFeature, genericErrorHandler);
         function startFeature(log) {
             if (log.length === 0) {
@@ -63,7 +63,7 @@ function startFeature(outChannel, featureName) {
     });
 }
 function finishFeature(outChannel) {
-    gitUtils.getGitRepositoryPath(vscode.window.activeTextEditor.document.fileName).then(function (gitRepositoryPath) {
+    gitUtils.getGitRepositoryPath(vscode.workspace.rootPath).then(function (gitRepositoryPath) {
         gitflowUtils.finishFeature(gitRepositoryPath).then(finishFeature, genericErrorHandler);
         function finishFeature(log) {
             if (log.length === 0) {

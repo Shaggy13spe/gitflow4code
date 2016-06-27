@@ -19,13 +19,14 @@ function run(outChannel) {
         outChannel.clear();
         if (item.label === itemPickList[0].label)
             vscode.window.showInputBox({ prompt: 'Name of Release: ' }).then(function (val) { return startRelease(outChannel, val); });
-        else
-            finishRelease(outChannel);
+        else {
+            vscode.window.showInputBox({ prompt: 'Tag this release with: ' }).then(function (val) { return finishRelease(outChannel, val); });
+        }
     });
 }
 exports.run = run;
 function startRelease(outChannel, releaseName) {
-    gitUtils.getGitRepositoryPath(vscode.window.activeTextEditor.document.fileName).then(function (gitRepositoryPath) {
+    gitUtils.getGitRepositoryPath(vscode.workspace.rootPath).then(function (gitRepositoryPath) {
         gitflowUtils.startRelease(gitRepositoryPath, releaseName).then(startRelease, genericErrorHandler);
         function startRelease(log) {
             if (log.length === 0) {
@@ -54,9 +55,9 @@ function startRelease(outChannel, releaseName) {
         }
     });
 }
-function finishRelease(outChannel) {
-    gitUtils.getGitRepositoryPath(vscode.window.activeTextEditor.document.fileName).then(function (gitRepositoryPath) {
-        gitflowUtils.finishRelease(gitRepositoryPath).then(finishRelease, genericErrorHandler);
+function finishRelease(outChannel, releaseTag) {
+    gitUtils.getGitRepositoryPath(vscode.workspace.rootPath).then(function (gitRepositoryPath) {
+        gitflowUtils.finishRelease(gitRepositoryPath, releaseTag).then(finishRelease, genericErrorHandler);
         function finishRelease(log) {
             if (log.length === 0) {
                 vscode.window.showInformationMessage('Nothing to show');

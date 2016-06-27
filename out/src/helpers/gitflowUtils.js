@@ -165,7 +165,7 @@ function startRelease(rootDir, releaseName) {
     });
 }
 exports.startRelease = startRelease;
-function finishRelease(rootDir) {
+function finishRelease(rootDir, releaseTag) {
     return gitUtils.getGitPath().then(function (gitExecutable) {
         return new Promise(function (resolve, reject) {
             var options = { cwd: rootDir };
@@ -191,7 +191,7 @@ function finishRelease(rootDir) {
                     reject('Not currently on a Release branch');
                     return;
                 }
-                var ls2 = spawn(gitExecutable, ['flow', 'release', 'finish', currentBranch], options);
+                var ls2 = spawn(gitExecutable, ['flow', 'release', 'finish', currentBranch, '-m ' + releaseTag], options);
                 var log = '';
                 var error = '';
                 ls2.stdout.on('data', function (data) {
