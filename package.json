@@ -2,7 +2,7 @@
     "name": "gitflow4code",
     "displayName": "GitFlow 4 Code",
     "description": "Adds GitFlow support to VS Code",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "publisher": "michaelmorrison",
     "license": "SEE LICENSE IN LICENSE or README.MD",
     "homepage": "https://github.com/michaelmorrison/gitflow4code/blob/master/README.md",
@@ -10,7 +10,7 @@
         "type": "git",
         "url": "https://github.com/michaelmorrison/gitflow4code/"
     },
-    "icon": "images/icon.png",
+    "icon": "images/gitflow.jpg",
     "galleryBanner": {
         "color": "#0000FF",
         "theme": "dark"
