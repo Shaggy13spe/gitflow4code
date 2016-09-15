@@ -2,7 +2,7 @@
     "name": "gitflow4code",
     "displayName": "GitFlow 4 Code",
     "description": "Adds GitFlow support to VS Code",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "publisher": "GreatMinds",
     "license": "SEE LICENSE IN LICENSE or README.MD",
     "homepage": "https://github.com/michaelmorrison/gitflow4code/blob/master/README.md",
@@ -26,10 +26,12 @@
     ],
     "main": "./out/src/gitflow",
     "contributes": {
-        "commands": [{
-            "command": "gitflow.GitFlow",
-            "title": "GitFlow: Run GitFlow commands"
-        }]
+        "commands": [
+            {
+                "command": "gitflow.GitFlow",
+                "title": "GitFlow: Run GitFlow commands"
+            }
+        ]
     },
     "scripts": {
         "vscode:prepublish": "node ./node_modules/vscode/bin/compile",

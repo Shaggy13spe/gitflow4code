@@ -22,7 +22,7 @@ will be added.
 * [Vincent Driessen's branching model](http://nvie.com/posts/a-successful-git-branching-model/)
 * [git-flow cheatsheet](http://danielkummer.github.io/git-flow-cheatsheet/)
 * [What is git-flow](https://yakiloo.com/getting-started-git-flow/)
-* [git-flow on GitHub](https://github.com/nvie/gitflow)
+* [git-flow on GitHub](https://github.com/petervanderdoes/gitflow-avh)
 
 
 
