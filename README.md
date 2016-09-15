@@ -15,7 +15,7 @@ will be added.
 
 ## Dependencies
 * git (if you have installed VS Code, this should also already exist on your machine)
-* [git-flow](https://github.com/nvie/gitflow)
+* [git-flow](https://github.com/petervanderdoes/gitflow-avh)
 
 
 ### For more information on git-flow
