@@ -12,6 +12,8 @@ function activate(context) {
     // Use the console to output diagnostic information (console.log) and errors (console.error)
     // This line of code will only be executed once when your extension is activated
     console.log('Congratulations, your extension "gitflow4code" is now active!');
+    var featureFinisher = new FeatureStatusItem();
+    featureFinisher.showFeatureStatus();
     var outChannel;
     outChannel = vscode.window.createOutputChannel('Git');
     // The command has been defined in the package.json file
@@ -57,9 +59,25 @@ function activate(context) {
             }
         });
     });
+    context.subscriptions.push(featureFinisher);
     context.subscriptions.push(disposable);
 }
 exports.activate = activate;
+var FeatureStatusItem = (function () {
+    function FeatureStatusItem() {
+    }
+    FeatureStatusItem.prototype.showFeatureStatus = function () {
+        if (!this._statusBarItem)
+            this._statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
+        this._statusBarItem.text = 'feature test';
+        this._statusBarItem.command = 'hello';
+        this._statusBarItem.show();
+    };
+    FeatureStatusItem.prototype.dispose = function () {
+        this._statusBarItem.dispose();
+    };
+    return FeatureStatusItem;
+}());
 // this method is called when your extension is deactivated
 function deactivate() {
 }

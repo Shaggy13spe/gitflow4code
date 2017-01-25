@@ -5,11 +5,12 @@
     "version": "0.0.3",
     "publisher": "GreatMinds",
     "license": "SEE LICENSE IN LICENSE or README.MD",
-    "homepage": "https://github.com/michaelmorrison/gitflow4code/blob/master/README.md",
+    "homepage": "https://github.com/shaggy13spe/gitflow4code/blob/master/README.md",
     "repository": {
         "type": "git",
-        "url": "https://github.com/michaelmorrison/gitflow4code/"
+        "url": "https://github.com/shaggy13spe/gitflow4code/"
     },
+    "issues": "https://github.com/shaggy13spe/gitflow4code/issues",
     "icon": "images/gitflow.jpg",
     "galleryBanner": {
         "color": "#0000FF",
@@ -21,8 +22,13 @@
     "categories": [
         "Other"
     ],
+    "tags": [
+        "git",
+        "gitflow"
+    ],
     "activationEvents": [
-        "onCommand:gitflow.GitFlow"
+        "onCommand:gitflow.GitFlow",
+        "*"
     ],
     "main": "./out/src/gitflow",
     "contributes": {
@@ -30,6 +36,14 @@
             {
                 "command": "gitflow.GitFlow",
                 "title": "GitFlow: Run GitFlow commands"
+            }
+        ],
+        "keybindings": [
+            {
+                "key": "alt+ctrl+/",
+                "mac": "alt+cmd+/",
+                "command": "gitflow.GitFlow",
+                "when": "editorTextFocus"
             }
         ]
     },
