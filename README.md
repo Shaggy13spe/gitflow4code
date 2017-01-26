@@ -5,13 +5,12 @@ This is a Visual Studio Code extension that adds support for git-flow
 ### What's included
 In this early release, very basic support has been added allowing the user to:
 * Start/Finish Feature branches
-* Start/Finish Release branches (without tags)
-* Start/Finish Hotfix branches (without tags)
+* Start/Finish Release branches
+* Start/Finish Hotfix branches
 * Get the status of a git repository
 
 ### gitflow4code roadmap
-In future releases, more robust support for allowing tags and other command line options
-will be added.
+What features would you like to see?
 
 ## Dependencies
 * git (if you have installed VS Code, this should also already exist on your machine)
