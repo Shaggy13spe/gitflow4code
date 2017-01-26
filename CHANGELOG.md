@@ -8,11 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - This CHANGELOG file.
 
-###
-- Updated package.json to add keywords and badgesvsc
-
 ### Changed
 - Updated README file.
+- Updated package.json to add keywords and badges
 
 ## [0.0.4] - 2017-1-26
 ### Fixed
