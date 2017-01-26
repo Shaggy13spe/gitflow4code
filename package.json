@@ -3,7 +3,7 @@
     "displayName": "GitFlow 4 Code",
     "description": "Adds GitFlow support to VS Code",
     "icon": "images/gitflow.jpg",
-    "version": "0.0.4",
+    "version": "0.0.5",
     "publisher": "GreatMinds",
     "license": "SEE LICENSE IN LICENSE or README.MD",
     "homepage": "https://github.com/shaggy13spe/gitflow4code/blob/master/README.md",
@@ -15,7 +15,10 @@
         "Other"
     ],
     "keywords": [
-        "git", "gitflow", "source control", "branching"
+        "git",
+        "gitflow",
+        "source control",
+        "branching"
     ],
     "bugs": {
         "url": "https://github.com/shaggy13spe/gitflow4code/issues"
