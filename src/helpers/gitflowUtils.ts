@@ -12,35 +12,77 @@ A branch name can not:
     - Have an ASCII control character, "~", "^", ":" or SP, anywhere
     - End with a "/"
     - End with ".lock"
-    - Contain a "\" (backslash
+    - Contain a "\" (backslash)
 */
+
+function hasIllegalChars(branchName) {
+
+    if(branchName.indexOf('/') > 0) {
+        var index = branchName.indexOf('/');
+        if(index === branchName.length - 1)
+            return true;
+    }
+    else if(branchName.indexOf('.lock') >= 0) {
+        var index = branchName.indexOf('.lock');
+        if(index === branchName.length - 5)
+            return true;
+    }
+    else if(branchName.indexOf('.') >= 0)
+        return true;
+    else if(branchName.indexOf('..') >= 0)
+        return true;
+    else if(branchName.indexOf('~') >= 0)
+        return true;
+    else if(branchName.indexOf('^') >= 0)
+        return true;
+    else if(branchName.indexOf(':') >= 0)
+        return true;
+    else if(branchName.indexOf('\\') >= 0)
+        return true;
+        
+    else return false;
+}
 
 export function startFeature(rootDir, featureName) {
     return gitUtils.getGitPath().then(function (gitExecutable) {
         return new Promise(function (resolve, reject) {
             featureName = featureName.replace(/ /g, '_');
-            let options = { cwd: rootDir };
-            let spawn = require('child_process').spawn;
-            let ls = spawn(gitExecutable, ['flow', 'feature', 'start', featureName], options);
-            let log = '';
-            let error = '';
-            ls.stdout.on('data', function (data) {
-                log += data + '\n';
-            });
-            ls.stderr.on('data', function (data) {
-                error += data;
-            });
-            ls.on('exit', function (code) {
-                if(code > 0) {
-                    reject(error);
-                    return;
-                }
-                var message = log;
-                if(code === 0 && error.length > 0)
-                    message += '\n\n' + error;
-                    
-                resolve(message);
-            });
+            
+            if(hasIllegalChars(featureName)) 
+                reject('Branch name has illegal characters\n' +
+                    'A branch name can not:\n' +
+                    '\t- Have a path component that begins with "."\n' +
+                    '\t- Have a double dot ".."\n' +
+                    '\t- Have an ASCII control character, "~", "^", ":" or SP, anywhere\n' +
+                    '\t- End with a "/"\n' +
+                    '\t- End with ".lock"\n' +
+                    '\t- Contain a "\" (backslash))');
+            else {
+                let options = { cwd: rootDir };
+                let spawn = require('child_process').spawn;
+                let ls = spawn(gitExecutable, ['flow', 'feature', 'start', featureName], options);
+                let log = '';
+                let error = '';
+                ls.stdout.on('data', function (data) {
+                    log += data + '\n';
+                });
+                ls.stderr.on('data', function (data) {
+                    error += data;
+                });
+                ls.on('exit', function (code) {
+                    if(code > 0) {
+                        reject(error);
+                        return;
+                    }
+                    var message = log;
+                    if(code === 0 && error.length > 0)
+                        message += '\n\n' + error;
+                        
+                    resolve(message);
+                });
+            }   
+            
+          
         });
     });
 }
@@ -100,33 +142,45 @@ export function startRelease(rootDir, releaseName) {
     return gitUtils.getGitPath().then(function (gitExecutable) {
         return new Promise(function (resolve, reject) {
             releaseName = releaseName.replace(/ /g, '_');
-            let options = { cwd: rootDir };
-            let spawn = require('child_process').spawn;
-            let ls = spawn(gitExecutable, ['flow', 'release', 'start', releaseName], options);
-            let log = '';
-            let error = '';
-            ls.stdout.on('data', function (data) {
-                log += data + '\n';
-            });
-            ls.stderr.on('data', function (data) {
-                error += data;
-            });
-            ls.on('exit', function (code) {
-                if(code > 0) {
-                    reject(error);
-                    return;
-                }
-                var message = log;
-                if(code === 0 && error.length > 0)
-                    message += '\n\n' + error;
-                    
-                resolve(message);
-            });
+            
+            if(hasIllegalChars(releaseName)) 
+                reject('Branch name has illegal characters\n' +
+                    'A branch name can not:\n' +
+                    '\t- Have a path component that begins with "."\n' +
+                    '\t- Have a double dot ".."\n' +
+                    '\t- Have an ASCII control character, "~", "^", ":" or SP, anywhere\n' +
+                    '\t- End with a "/"\n' +
+                    '\t- End with ".lock"\n' +
+                    '\t- Contain a "\" (backslash))');
+            else {
+                let options = { cwd: rootDir };
+                let spawn = require('child_process').spawn;
+                let ls = spawn(gitExecutable, ['flow', 'release', 'start', releaseName], options);
+                let log = '';
+                let error = '';
+                ls.stdout.on('data', function (data) {
+                    log += data + '\n';
+                });
+                ls.stderr.on('data', function (data) {
+                    error += data;
+                });
+                ls.on('exit', function (code) {
+                    if(code > 0) {
+                        reject(error);
+                        return;
+                    }
+                    var message = log;
+                    if(code === 0 && error.length > 0)
+                        message += '\n\n' + error;
+                        
+                    resolve(message);
+                });
+            }
         });
     });
 }
 
-export function finishRelease(rootDir) {
+export function finishRelease(rootDir, releaseTag) {
     return gitUtils.getGitPath().then(function (gitExecutable) {
         return new Promise(function(resolve, reject) {
             let options = { cwd: rootDir };
@@ -152,7 +206,8 @@ export function finishRelease(rootDir) {
                     reject('Not currently on a Release branch');
                     return;
                 }
-                let ls2 = spawn(gitExecutable, ['flow', 'release', 'finish', currentBranch], options);
+                
+                let ls2 = spawn(gitExecutable, ['flow', 'release', 'finish', currentBranch, '-m ' + releaseTag], options);
                 let log = '';
                 let error = '';
                 ls2.stdout.on('data', function (data) {
@@ -181,33 +236,45 @@ export function startHotfix(rootDir, hotfixName) {
     return gitUtils.getGitPath().then(function (gitExecutable) {
         return new Promise(function (resolve, reject) {
             hotfixName = hotfixName.replace(/ /g, '_');
-            let options = { cwd: rootDir };
-            let spawn = require('child_process').spawn;
-            let ls = spawn(gitExecutable, ['flow', 'hotfix', 'start', hotfixName], options);
-            let log = '';
-            let error = '';
-            ls.stdout.on('data', function (data) {
-                log += data + '\n';
-            });
-            ls.stderr.on('data', function (data) {
-                error += data;
-            });
-            ls.on('exit', function (code) {
-                if(code > 0) {
-                    reject(error);
-                    return;
-                }
-                var message = log;
-                if(code === 0 && error.length > 0)
-                    message += '\n\n' + error;
-                    
-                resolve(message);
-            });
+            
+            if(hasIllegalChars(hotfixName)) 
+                reject('Branch name has illegal characters\n' +
+                    'A branch name can not:\n' +
+                    '\t- Have a path component that begins with "."\n' +
+                    '\t- Have a double dot ".."\n' +
+                    '\t- Have an ASCII control character, "~", "^", ":" or SP, anywhere\n' +
+                    '\t- End with a "/"\n' +
+                    '\t- End with ".lock"\n' +
+                    '\t- Contain a "\" (backslash))');
+            else {
+                let options = { cwd: rootDir };
+                let spawn = require('child_process').spawn;
+                let ls = spawn(gitExecutable, ['flow', 'hotfix', 'start', hotfixName], options);
+                let log = '';
+                let error = '';
+                ls.stdout.on('data', function (data) {
+                    log += data + '\n';
+                });
+                ls.stderr.on('data', function (data) {
+                    error += data;
+                });
+                ls.on('exit', function (code) {
+                    if(code > 0) {
+                        reject(error);
+                        return;
+                    }
+                    var message = log;
+                    if(code === 0 && error.length > 0)
+                        message += '\n\n' + error;
+                        
+                    resolve(message);
+                });
+            }
         });
     });
 }
 
-export function finishHotfix(rootDir) {
+export function finishHotfix(rootDir, hotfixTag) {
     return gitUtils.getGitPath().then(function (gitExecutable) {
         return new Promise(function(resolve, reject) {
             let options = { cwd: rootDir };
@@ -233,7 +300,7 @@ export function finishHotfix(rootDir) {
                     reject('Not currently on a Hotfix branch');
                     return;
                 }
-                let ls2 = spawn(gitExecutable, ['flow', 'hotfix', 'finish', currentBranch], options);
+                let ls2 = spawn(gitExecutable, ['flow', 'hotfix', 'finish', currentBranch, '-m ' + hotfixTag], options);
                 let log = '';
                 let error = '';
                 ls2.stdout.on('data', function (data) {

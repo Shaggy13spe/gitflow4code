@@ -15,14 +15,14 @@ will be added.
 
 ## Dependencies
 * git (if you have installed VS Code, this should also already exist on your machine)
-* [git-flow](https://github.com/nvie/gitflow)
+* [git-flow](https://github.com/petervanderdoes/gitflow-avh)
 
 
 ### For more information on git-flow
 * [Vincent Driessen's branching model](http://nvie.com/posts/a-successful-git-branching-model/)
 * [git-flow cheatsheet](http://danielkummer.github.io/git-flow-cheatsheet/)
 * [What is git-flow](https://yakiloo.com/getting-started-git-flow/)
-* [git-flow on GitHub](https://github.com/nvie/gitflow)
+* [git-flow on GitHub](https://github.com/petervanderdoes/gitflow-avh)
 
 
 

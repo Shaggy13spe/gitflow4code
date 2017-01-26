@@ -21,13 +21,13 @@ export function run(outChannel) {
         if(item.label === itemPickList[0].label)
             vscode.window.showInputBox({ prompt: 'Name of Hotfix: ' }).then(val => startHotfix(outChannel, val));
         else
-            finishHotfix(outChannel);
+            vscode.window.showInputBox({ prompt: 'Tag this hotfix with: ' }).then(val => finishHotfix(outChannel, val));
         
     });
 }
 
 function startHotfix(outChannel, featureName) {
-    gitUtils.getGitRepositoryPath(vscode.window.activeTextEditor.document.fileName).then(function (gitRepositoryPath) {
+    gitUtils.getGitRepositoryPath(vscode.workspace.rootPath).then(function (gitRepositoryPath) {
         gitflowUtils.startHotfix(gitRepositoryPath, featureName).then(startHotfix, genericErrorHandler);
         function startHotfix(log) {
             if(log.length === 0) {
@@ -58,9 +58,9 @@ function startHotfix(outChannel, featureName) {
     });
 }
 
-function finishHotfix(outChannel) {
-    gitUtils.getGitRepositoryPath(vscode.window.activeTextEditor.document.fileName).then(function (gitRepositoryPath) {
-        gitflowUtils.finishHotfix(gitRepositoryPath).then(finishHotfix, genericErrorHandler);
+function finishHotfix(outChannel, hotfixTag) {
+    gitUtils.getGitRepositoryPath(vscode.workspace.rootPath).then(function (gitRepositoryPath) {
+        gitflowUtils.finishHotfix(gitRepositoryPath, hotfixTag).then(finishHotfix, genericErrorHandler);
         function finishHotfix(log) {
             if(log.length === 0) {
                 vscode.window.showInformationMessage('Nothing to show');
