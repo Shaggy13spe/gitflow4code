@@ -2,6 +2,7 @@
     "name": "gitflow4code",
     "displayName": "GitFlow 4 Code",
     "description": "Adds GitFlow support to VS Code",
+    "icon": "images/gitflow.jpg",
     "version": "0.0.4",
     "publisher": "GreatMinds",
     "license": "SEE LICENSE IN LICENSE or README.MD",
@@ -10,8 +11,15 @@
         "type": "git",
         "url": "https://github.com/shaggy13spe/gitflow4code/"
     },
-    "issues": "https://github.com/shaggy13spe/gitflow4code/issues",
-    "icon": "images/gitflow.jpg",
+    "categories": [
+        "Other"
+    ],
+    "keywords": [
+        "git", "gitflow", "source control", "branching"
+    ],
+    "bugs": {
+        "url": "https://github.com/shaggy13spe/gitflow4code/issues"
+    },
     "galleryBanner": {
         "color": "#0000FF",
         "theme": "dark"
@@ -19,9 +27,6 @@
     "engines": {
         "vscode": "^0.10.10"
     },
-    "categories": [
-        "Other"
-    ],
     "tags": [
         "git",
         "gitflow"
@@ -47,6 +52,23 @@
             }
         ]
     },
+    "badges": [
+        {
+            "url": "http://vsmarketplacebadge.apphb.com/version-short/GreatMinds.gitflow4code.svg",
+            "href": "https://marketplace.visualstudio.com/items?itemName=GreatMinds.gitflow4code",
+            "description": "Extension version"
+        },
+        {
+            "url": "http://vsmarketplacebadge.apphb.com/installs/GreatMinds.gitflow4code.svg",
+            "href": "https://marketplace.visualstudio.com/items?itemName=GreatMinds.gitflow4code",
+            "description": "Extension installs"
+        },
+        {
+            "url": "http://vsmarketplacebadge.apphb.com/rating/GreatMinds.gitflow4code.svg",
+            "href": "https://marketplace.visualstudio.com/items?itemName=GreatMinds.gitflow4code#review-details",
+            "description": "Extension rating"
+        }
+    ],
     "scripts": {
         "vscode:prepublish": "node ./node_modules/vscode/bin/compile",
         "compile": "node ./node_modules/vscode/bin/compile -watch -p ./",
