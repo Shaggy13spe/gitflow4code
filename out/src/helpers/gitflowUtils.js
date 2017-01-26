@@ -255,7 +255,7 @@ function startHotfix(rootDir, hotfixName) {
     });
 }
 exports.startHotfix = startHotfix;
-function finishHotfix(rootDir) {
+function finishHotfix(rootDir, hotfixTag) {
     return gitUtils.getGitPath().then(function (gitExecutable) {
         return new Promise(function (resolve, reject) {
             var options = { cwd: rootDir };
@@ -281,7 +281,7 @@ function finishHotfix(rootDir) {
                     reject('Not currently on a Hotfix branch');
                     return;
                 }
-                var ls2 = spawn(gitExecutable, ['flow', 'hotfix', 'finish', currentBranch], options);
+                var ls2 = spawn(gitExecutable, ['flow', 'hotfix', 'finish', currentBranch, '-m ' + hotfixTag], options);
                 var log = '';
                 var error = '';
                 ls2.stdout.on('data', function (data) {

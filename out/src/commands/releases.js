@@ -19,9 +19,8 @@ function run(outChannel) {
         outChannel.clear();
         if (item.label === itemPickList[0].label)
             vscode.window.showInputBox({ prompt: 'Name of Release: ' }).then(function (val) { return startRelease(outChannel, val); });
-        else {
+        else
             vscode.window.showInputBox({ prompt: 'Tag this release with: ' }).then(function (val) { return finishRelease(outChannel, val); });
-        }
     });
 }
 exports.run = run;

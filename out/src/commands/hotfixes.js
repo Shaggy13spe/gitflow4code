@@ -20,7 +20,7 @@ function run(outChannel) {
         if (item.label === itemPickList[0].label)
             vscode.window.showInputBox({ prompt: 'Name of Hotfix: ' }).then(function (val) { return startHotfix(outChannel, val); });
         else
-            finishHotfix(outChannel);
+            vscode.window.showInputBox({ prompt: 'Tag this hotfix with: ' }).then(function (val) { return finishHotfix(outChannel, val); });
     });
 }
 exports.run = run;
@@ -54,9 +54,9 @@ function startHotfix(outChannel, featureName) {
         }
     });
 }
-function finishHotfix(outChannel) {
+function finishHotfix(outChannel, hotfixTag) {
     gitUtils.getGitRepositoryPath(vscode.workspace.rootPath).then(function (gitRepositoryPath) {
-        gitflowUtils.finishHotfix(gitRepositoryPath).then(finishHotfix, genericErrorHandler);
+        gitflowUtils.finishHotfix(gitRepositoryPath, hotfixTag).then(finishHotfix, genericErrorHandler);
         function finishHotfix(log) {
             if (log.length === 0) {
                 vscode.window.showInformationMessage('Nothing to show');
