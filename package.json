@@ -28,7 +28,7 @@
         "theme": "dark"
     },
     "engines": {
-        "vscode": "^0.10.10"
+        "vscode": "^1.15.0"
     },
     "tags": [
         "git",
@@ -53,7 +53,43 @@
                 "command": "gitflow.GitFlow",
                 "when": "editorTextFocus"
             }
-        ]
+        ],
+        "configuration": {
+            "type": "object",
+            "title": "gitflow initialization",
+            "properties": {
+                "giftlow.developBranch": {
+                    "type": "string",
+                    "default": "develop",
+                    "description": "gitflow branch for development"
+                },
+                "giftlow.masterBranch": {
+                    "type": "string",
+                    "default": "master",
+                    "description": "gitflow branch for master"
+                },
+                "giftlow.featureBranch": {
+                    "type": "string",
+                    "default": "feature",
+                    "description": "gitflow branch for features"
+                },
+                "giftlow.releaseBranch": {
+                    "type": "string",
+                    "default": "release",
+                    "description": "gitflow branch for releases"
+                },
+                "giftlow.hotfixBranch": {
+                    "type": "string",
+                    "default": "hotfix",
+                    "description": "gitflow branch for hotfixes"
+                },
+                "giftlow.supportBranch": {
+                    "type": "string",
+                    "default": "support",
+                    "description": "gitflow branch for support"
+                }
+            }
+        }
     },
     "badges": [
         {
