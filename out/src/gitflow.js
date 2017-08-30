@@ -18,8 +18,8 @@ function activate(context) {
     var config = workspace.getConfiguration();
     // retrieve values for gitflow4code
     var configValues = config.get('gitflow4code');
-    var featureFinisher = new FeatureStatusItem();
-    featureFinisher.showFeatureStatus();
+    // let featureFinisher = new FeatureStatusItem();
+    // featureFinisher.showFeatureStatus();
     var outChannel;
     outChannel = vscode.window.createOutputChannel('Git');
     //first we'll check to see if repo is initialized

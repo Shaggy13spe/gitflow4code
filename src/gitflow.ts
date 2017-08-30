@@ -24,8 +24,8 @@ export function activate(context: vscode.ExtensionContext) {
     // retrieve values for gitflow4code
     const configValues = config.get('gitflow4code') as ConfigSettings.ConfigSettings;
 
-    let featureFinisher = new FeatureStatusItem();
-    featureFinisher.showFeatureStatus();
+    // let featureFinisher = new FeatureStatusItem();
+    // featureFinisher.showFeatureStatus();
 
     var outChannel;
     outChannel = vscode.window.createOutputChannel('Git');
