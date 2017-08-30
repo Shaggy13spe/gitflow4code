@@ -28,7 +28,7 @@ export function run(outChannel) {
 
 function startFeature(outChannel, featureName) {
     gitUtils.getGitRepositoryPath(vscode.workspace.rootPath).then(function (gitRepositoryPath) {
-        gitflowUtils.startFeature(gitRepositoryPath, featureName).then(startFeature, genericErrorHandler);
+        gitflowUtils.startFeature(gitRepositoryPath, featureName, null).then(startFeature, genericErrorHandler);
             function startFeature(log) {
                 if(log.length === 0) {
                     vscode.window.showInformationMessage('Nothing to show');
