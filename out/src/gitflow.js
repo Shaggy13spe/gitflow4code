@@ -75,7 +75,7 @@ function activate(context) {
             }
         });
     });
-    context.subscriptions.push(featureFinisher);
+    // context.subscriptions.push(featureFinisher);
     context.subscriptions.push(disposable);
 }
 exports.activate = activate;

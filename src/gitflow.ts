@@ -87,7 +87,7 @@ export function activate(context: vscode.ExtensionContext) {
         
     });
 
-    context.subscriptions.push(featureFinisher);
+    // context.subscriptions.push(featureFinisher);
     context.subscriptions.push(disposable);
     
 }
