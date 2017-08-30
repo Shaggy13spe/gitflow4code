@@ -35,6 +35,62 @@ function hasIllegalChars(branchName) {
     else
         return false;
 }
+function checkForBranch(rootDir, branchName) {
+    return gitUtils.getGitPath().then(function (gitExecutable) {
+        return new Promise(function (resolve, reject) {
+            var options = { cwd: rootDir };
+            var spawn = require('child_process').spawn;
+            var ls = spawn(gitExecutable, ['show-ref', '--verify', '--quiet', 'refs/heads/' + branchName], options);
+            var log = '';
+            var error = '';
+            ls.stdout.on('data', function (data) {
+                log += data + '\n';
+            });
+            ls.stderr.on('data', function (data) {
+                error += data;
+            });
+            ls.on('exit', function (code) {
+                if (code > 0) {
+                    reject(error);
+                    return;
+                }
+                var message = log;
+                if (code === 0 && error.length > 0)
+                    message += '\n\n' + error;
+                resolve(message);
+            });
+        });
+    });
+}
+exports.checkForBranch = checkForBranch;
+function initializeWithDefaults(rootDir) {
+    return gitUtils.getGitPath().then(function (gitExecutable) {
+        return new Promise(function (resolve, reject) {
+            var options = { cwd: rootDir };
+            var spawn = require('child_process').spawn;
+            var ls = spawn(gitExecutable, ['checkout', '-b', 'develop'], options);
+            var log = '';
+            var error = '';
+            ls.stdout.on('data', function (data) {
+                log += data + '\n';
+            });
+            ls.stderr.on('data', function (data) {
+                error += data + '\n';
+            });
+            ls.on('exit', function (code) {
+                if (code > 0) {
+                    reject(error);
+                    return;
+                }
+                var message = log;
+                if (code === 0 && error.length > 0)
+                    message += '\n\n' + error;
+                resolve(message);
+            });
+        });
+    });
+}
+exports.initializeWithDefaults = initializeWithDefaults;
 function startFeature(rootDir, featureName) {
     return gitUtils.getGitPath().then(function (gitExecutable) {
         return new Promise(function (resolve, reject) {
@@ -51,7 +107,7 @@ function startFeature(rootDir, featureName) {
             else {
                 var options = { cwd: rootDir };
                 var spawn = require('child_process').spawn;
-                var ls = spawn(gitExecutable, ['flow', 'feature', 'start', featureName], options);
+                var ls = spawn(gitExecutable, ['checkout', '-b', 'feature/' + featureName], options);
                 var log_1 = '';
                 var error_1 = '';
                 ls.stdout.on('data', function (data) {

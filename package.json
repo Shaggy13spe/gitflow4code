@@ -56,34 +56,34 @@
         ],
         "configuration": {
             "type": "object",
-            "title": "gitflow initialization",
+            "title": "greatminds.gitflow4code",
             "properties": {
-                "giftlow.developBranch": {
+                "gitflow4code.develop": {
                     "type": "string",
                     "default": "develop",
-                    "description": "gitflow branch for development"
+                    "description": "Default name for the development branch [develop]"
                 },
-                "giftlow.masterBranch": {
+                "gitflow4code.master": {
                     "type": "string",
                     "default": "master",
-                    "description": "gitflow branch for master"
+                    "description": "Default name for the master branch [master]"
                 },
-                "giftlow.featureBranch": {
+                "gitflow4code.features": {
                     "type": "string",
                     "default": "feature",
                     "description": "gitflow branch for features"
                 },
-                "giftlow.releaseBranch": {
+                "gitflow4code.releases": {
                     "type": "string",
                     "default": "release",
                     "description": "gitflow branch for releases"
                 },
-                "giftlow.hotfixBranch": {
+                "gitflow4code.hotfixes": {
                     "type": "string",
                     "default": "hotfix",
                     "description": "gitflow branch for hotfixes"
                 },
-                "giftlow.supportBranch": {
+                "gitflow4code.support": {
                     "type": "string",
                     "default": "support",
                     "description": "gitflow branch for support"

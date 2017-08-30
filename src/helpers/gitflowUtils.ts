@@ -43,6 +43,64 @@ function hasIllegalChars(branchName) {
     else return false;
 }
 
+export function checkForBranch(rootDir, branchName) {
+    return gitUtils.getGitPath().then(function (gitExecutable) {
+        return new Promise(function (resolve, reject) {
+            let options = { cwd: rootDir };
+            let spawn = require('child_process').spawn;
+            let ls = spawn(gitExecutable, ['show-ref', '--verify', '--quiet', 'refs/heads/' + branchName], options);
+            let log = '';
+            let error = '';
+            ls.stdout.on('data', function (data) {
+                log += data + '\n';
+            });
+            ls.stderr.on('data', function (data) {
+                error += data;
+            });
+            ls.on('exit', function (code) {
+                if(code > 0) {
+                    reject(error);
+                    return;
+                }
+                var message = log;
+                if(code === 0 && error.length > 0)
+                    message += '\n\n' + error;
+                    
+                resolve(message);
+            });
+        });
+    });
+}
+
+export function initializeWithDefaults(rootDir) {
+    return gitUtils.getGitPath().then(function(gitExecutable) {
+        return new Promise(function(resolve, reject) {
+            let options = { cwd: rootDir };
+            let spawn = require('child_process').spawn;
+            let ls = spawn(gitExecutable, ['checkout', '-b', 'develop'], options);
+            let log = '';
+            let error = '';
+            ls.stdout.on('data', function(data) {
+                log += data + '\n';
+            });
+            ls.stderr.on('data', function(data) {
+                error += data + '\n';
+            });
+            ls.on('exit', function(code) {
+                if(code > 0) {
+                    reject(error);
+                    return;
+                }
+                var message = log;
+                if(code === 0 && error.length > 0)
+                    message += '\n\n' + error;
+
+                resolve(message);
+            });
+        });
+    });
+}
+
 export function startFeature(rootDir, featureName) {
     return gitUtils.getGitPath().then(function (gitExecutable) {
         return new Promise(function (resolve, reject) {
@@ -60,7 +118,7 @@ export function startFeature(rootDir, featureName) {
             else {
                 let options = { cwd: rootDir };
                 let spawn = require('child_process').spawn;
-                let ls = spawn(gitExecutable, ['flow', 'feature', 'start', featureName], options);
+                let ls = spawn(gitExecutable, ['checkout', '-b', 'feature/' + featureName], options);
                 let log = '';
                 let error = '';
                 ls.stdout.on('data', function (data) {
