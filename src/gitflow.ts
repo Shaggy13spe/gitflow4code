@@ -31,8 +31,8 @@ export function activate(context: vscode.ExtensionContext) {
     outChannel = vscode.window.createOutputChannel('Git');
 
     //first we'll check to see if repo is initialized
-    let developExists = initCommands.checkForInit(outChannel, configValues.develop);
-    let masterExists = initCommands.checkForInit(outChannel, configValues.master);
+    // let developExists = initCommands.checkForInit(outChannel, configValues.develop);
+    // let masterExists = initCommands.checkForInit(outChannel, configValues.master);
 
     // The command has been defined in the package.json file
     // Now provide the implementation of the command with registerCommand
