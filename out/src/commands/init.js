@@ -6,11 +6,7 @@ function run(outChannel) {
     var itemPickList = [
         {
             label: "Initialize with defaults",
-            description: "Initialize gitflow with [develop], [master], [feature], [release], [hotfix], and [support]"
-        },
-        {
-            label: "Initialize with custom values",
-            description: "Initialize gitflow with custom values"
+            description: "Initialize gitflow with [develop], [master], [feature], [release], and [hotfix]"
         }
     ];
     vscode.window.showQuickPick(itemPickList).then(function (item) {

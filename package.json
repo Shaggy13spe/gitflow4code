@@ -58,35 +58,16 @@
             "type": "object",
             "title": "greatminds.gitflow4code",
             "properties": {
-                "gitflow4code.develop": {
-                    "type": "string",
-                    "default": "develop",
-                    "description": "Default name for the development branch [develop]"
-                },
-                "gitflow4code.master": {
-                    "type": "string",
-                    "default": "master",
-                    "description": "Default name for the master branch [master]"
-                },
-                "gitflow4code.features": {
-                    "type": "string",
-                    "default": "feature",
-                    "description": "gitflow branch for features"
-                },
-                "gitflow4code.releases": {
-                    "type": "string",
-                    "default": "release",
-                    "description": "gitflow branch for releases"
-                },
-                "gitflow4code.hotfixes": {
-                    "type": "string",
-                    "default": "hotfix",
-                    "description": "gitflow branch for hotfixes"
-                },
-                "gitflow4code.support": {
-                    "type": "string",
-                    "default": "support",
-                    "description": "gitflow branch for support"
+                "gitflow4code.init": {
+                    "type": "object",
+                    "description": "Initialization values for git flow branches",
+                    "default": {
+                        "develop": "develop",
+                        "master": "master",
+                        "features": "feature",
+                        "releases": "release",
+                        "hotfixes": "hotfix"
+                    }
                 }
             }
         }
