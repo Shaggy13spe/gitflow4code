@@ -3,7 +3,7 @@
     "displayName": "GitFlow 4 Code",
     "description": "Adds GitFlow support to VS Code",
     "icon": "images/gitflow.jpg",
-    "version": "0.0.5",
+    "version": "0.1.0",
     "publisher": "GreatMinds",
     "license": "SEE LICENSE IN LICENSE or README.MD",
     "homepage": "https://github.com/shaggy13spe/gitflow4code/blob/master/README.md",
@@ -74,17 +74,17 @@
     },
     "badges": [
         {
-            "url": "http://vsmarketplacebadge.apphb.com/version-short/GreatMinds.gitflow4code.svg",
+            "url": "https://vsmarketplacebadge.apphb.com/version-short/GreatMinds.gitflow4code.svg",
             "href": "https://marketplace.visualstudio.com/items?itemName=GreatMinds.gitflow4code",
             "description": "Extension version"
         },
         {
-            "url": "http://vsmarketplacebadge.apphb.com/installs/GreatMinds.gitflow4code.svg",
+            "url": "https://vsmarketplacebadge.apphb.com/installs/GreatMinds.gitflow4code.svg",
             "href": "https://marketplace.visualstudio.com/items?itemName=GreatMinds.gitflow4code",
             "description": "Extension installs"
         },
         {
-            "url": "http://vsmarketplacebadge.apphb.com/rating/GreatMinds.gitflow4code.svg",
+            "url": "https://vsmarketplacebadge.apphb.com/rating/GreatMinds.gitflow4code.svg",
             "href": "https://marketplace.visualstudio.com/items?itemName=GreatMinds.gitflow4code#review-details",
             "description": "Extension rating"
         }
