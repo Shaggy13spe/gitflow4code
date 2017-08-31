@@ -1,9 +1,11 @@
 'use strict';
 import * as vscode from 'vscode';
+import { workspace } from 'vscode';
 import * as path from 'path';
 import * as child_process_1 from 'child_process';
 import * as fs from 'fs';
 import * as gitUtils from '../helpers/gitUtils';
+import { ConfigSettings } from '../settings/configSettings';
 
 /*
 A branch name can not:
@@ -43,67 +45,73 @@ function hasIllegalChars(branchName) {
     else return false;
 }
 
-export function checkForBranch(rootDir, branchName) {
-    return gitUtils.getGitPath().then(function (gitExecutable) {
-        return new Promise(function (resolve, reject) {
-            let options = { cwd: rootDir };
-            let spawn = require('child_process').spawn;
-            let ls = spawn(gitExecutable, ['show-ref', '--verify', '--quiet', 'refs/heads/' + branchName], options);
-            let log = '';
-            let error = '';
-            ls.stdout.on('data', function (data) {
-                log += data + '\n';
-            });
-            ls.stderr.on('data', function (data) {
-                error += data;
-            });
-            ls.on('exit', function (code) {
-                if(code > 0) {
-                    reject(error);
-                    return;
-                }
-                var message = log;
-                if(code === 0 && error.length > 0)
-                    message += '\n\n' + error;
-                    
-                resolve(message);
-            });
-        });
-    });
-}
-
-export function initializeWithDefaults(rootDir) {
+export function initializeRepository(rootDir) {
     return gitUtils.getGitPath().then(function(gitExecutable) {
+
+        const config = workspace.getConfiguration(); 
+        const configValues = config.get('gitflow4code.init') as ConfigSettings;
         return new Promise(function(resolve, reject) {
-            let options = { cwd: rootDir };
-            let spawn = require('child_process').spawn;
-            let ls = spawn(gitExecutable, ['checkout', '-b', 'develop'], options);
             let log = '';
             let error = '';
-            ls.stdout.on('data', function(data) {
-                log += data + '\n';
-            });
-            ls.stderr.on('data', function(data) {
-                error += data + '\n';
-            });
-            ls.on('exit', function(code) {
-                if(code > 0) {
-                    reject(error);
-                    return;
-                }
-                var message = log;
-                if(code === 0 && error.length > 0)
-                    message += '\n\n' + error;
+            gitUtils.checkForBranch(rootDir, configValues.master).then(function(result) {
+                if(!result) {
+                    let options = { cwd: rootDir };
+                    let spawn = require('child_process').spawn;
+                    let ls = spawn(gitExecutable, ['branch', configValues.master], options);
+                    ls.stdout.on('data', function(data) {
+                        log += data + '\n';
+                    });
+                    ls.stderr.on('data', function(data) {
+                        error += data + '\n';
+                    });
+                    ls.on('exit', function(code) {
+                        if(code > 0) return;
 
-                resolve(message);
+                        log += 'Created production branch ' +  configValues.master + '\n\n';
+                    });
+                }
+                gitUtils.checkForBranch(rootDir, configValues.develop).then(function(result) {
+                    if(!result) {
+                        let options = { cwd: rootDir };
+                        let spawn = require('child_process').spawn;
+                        let ls = spawn(gitExecutable, ['checkout', '-b', configValues.develop], options);
+                        ls.stdout.on('data', function(data) {
+                            log += data + '\n';
+                        });
+                        ls.stderr.on('data', function(data) {
+                            error += data + '\n';
+                        });
+                        ls.on('exit', function(code) {
+                            if(code > 0) {
+                                reject(error);
+                                return;
+                            }
+                            var message = log;
+                            if(code === 0 && error.length > 0)
+                                message += '\n\n' + error;
+    
+                            resolve(message);
+                        });
+                    }
+                    else
+                        resolve('Repository already initialized');
+                });
             });
+            
         });
+
+        
+        
     });
 }
 
 export function startFeature(rootDir, featureName, baseBranch) {
     return gitUtils.getGitPath().then(function (gitExecutable) {
         return new Promise(function (resolve, reject) {
+            const config = workspace.getConfiguration(); 
+            const configValues = config.get('gitflow4code.init') as ConfigSettings;
+            const featurePrefix = configValues.features;
+
             featureName = featureName.replace(/ /g, '_');
             
             if(hasIllegalChars(featureName)) 
@@ -117,11 +125,11 @@ export function startFeature(rootDir, featureName, baseBranch) {
                     '\t- Contain a "\" (backslash))');
             else {
                 if(!baseBranch)
-                    baseBranch = 'develop';
+                    baseBranch = configValues.develop;
 
                 let options = { cwd: rootDir };
                 let spawn = require('child_process').spawn;
-                let ls = spawn(gitExecutable, ['checkout', '-b', 'feature/' + featureName, baseBranch], options);
+                let ls = spawn(gitExecutable, ['checkout', '-b', featurePrefix + featureName, baseBranch], options);
                 let log = '';
                 let error = '';
                 ls.stdout.on('data', function (data) {
@@ -172,13 +180,16 @@ export function finishFeature(rootDir) {
                 }
 
                 currentBranch = branchData.replace(/ /g,'').trim().split('\n')[0];
-                inFeature = currentBranch.startsWith('feature/');
+                const config = workspace.getConfiguration(); 
+                const configValues = config.get('gitflow4code.init') as ConfigSettings;
+                const featurePrefix = configValues.features;
+                inFeature = currentBranch.startsWith(featurePrefix);
 
                 if(!inFeature) {
                     reject('Not currently on a Feature branch');
                     return;
                 }
-                let ls2 = spawn(gitExecutable, ['checkout', 'develop'], options);
+                let ls2 = spawn(gitExecutable, ['checkout', configValues.develop], options);
                 ls2.stdout.on('data', function (data) {
                     log += data + '\n';
                 });
@@ -227,6 +238,9 @@ export function finishFeature(rootDir) {
 export function startRelease(rootDir, releaseName) {
     return gitUtils.getGitPath().then(function (gitExecutable) {
         return new Promise(function (resolve, reject) {
+            const config = workspace.getConfiguration(); 
+            const configValues = config.get('gitflow4code.init') as ConfigSettings;
+            const releasePrefix = configValues.releases;
             releaseName = releaseName.replace(/ /g, '_');
             
             if(hasIllegalChars(releaseName)) 
@@ -241,7 +255,7 @@ export function startRelease(rootDir, releaseName) {
             else {
                 let options = { cwd: rootDir };
                 let spawn = require('child_process').spawn;
-                let ls = spawn(gitExecutable, ['checkout', '-b', 'release/' + releaseName, 'develop'], options);
+                let ls = spawn(gitExecutable, ['checkout', '-b', releasePrefix + releaseName, configValues.develop], options);
                 let log = '';
                 let error = '';
                 ls.stdout.on('data', function (data) {
@@ -290,13 +304,16 @@ export function finishRelease(rootDir, releaseTag) {
                 }
 
                 currentBranch = branchData.replace(/ /g,'').trim().split('\n')[0];
-                inRelease = currentBranch.startsWith('release/');
+                const config = workspace.getConfiguration(); 
+                const configValues = config.get('gitflow4code.init') as ConfigSettings;
+                const releasePrefix = configValues.releases;
+                inRelease = currentBranch.startsWith(releasePrefix);
                 
                 if(!inRelease) {
                     reject('Not currently on a Release branch');
                     return;
                 }
-                let ls2 = spawn(gitExecutable, ['checkout', 'master'], options);
+                let ls2 = spawn(gitExecutable, ['checkout', configValues.master], options);
                 ls2.stdout.on('data', function (data) {
                     log += data + '\n';
                 });
@@ -317,7 +334,7 @@ export function finishRelease(rootDir, releaseTag) {
                         error += data;
                     });
                     ls3.on('exit', function (code) {
-                        let ls4 = spawn(gitExecutable, ['checkout', 'develop'], options);
+                        let ls4 = spawn(gitExecutable, ['checkout', configValues.develop], options);
                         ls4.stdout.on('data', function (data) {
                             log += data + '\n';
                         });
@@ -368,6 +385,9 @@ export function finishRelease(rootDir, releaseTag) {
 export function startHotfix(rootDir, hotfixName) {
     return gitUtils.getGitPath().then(function (gitExecutable) {
         return new Promise(function (resolve, reject) {
+            const config = workspace.getConfiguration(); 
+            const configValues = config.get('gitflow4code.init') as ConfigSettings;
+            const hotfixPrefix = configValues.hotfixes;
             hotfixName = hotfixName.replace(/ /g, '_');
             
             if(hasIllegalChars(hotfixName)) 
@@ -382,7 +402,7 @@ export function startHotfix(rootDir, hotfixName) {
             else {
                 let options = { cwd: rootDir };
                 let spawn = require('child_process').spawn;
-                let ls = spawn(gitExecutable, ['checkout', '-b', 'hotfix/' + hotfixName, 'master'], options);
+                let ls = spawn(gitExecutable, ['checkout', '-b', hotfixPrefix + hotfixName, configValues.master], options);
                 let log = '';
                 let error = '';
                 ls.stdout.on('data', function (data) {
@@ -431,13 +451,16 @@ export function finishHotfix(rootDir, hotfixTag) {
                 }
 
                 currentBranch = branchData.replace(/ /g,'').trim().split('\n')[0];
-                inHotfix = currentBranch.startsWith('hotfix/');
+                const config = workspace.getConfiguration(); 
+                const configValues = config.get('gitflow4code.init') as ConfigSettings;
+                const hotfixPrefix = configValues.hotfixes;
+                inHotfix = currentBranch.startsWith(hotfixPrefix);
                 
                 if(!inHotfix) {
                     reject('Not currently on a Hotfix branch');
                     return;
                 }
-                let ls2 = spawn(gitExecutable, ['checkout', 'master'], options);
+                let ls2 = spawn(gitExecutable, ['checkout', configValues.master], options);
                 ls2.stdout.on('data', function (data) {
                     log += data + '\n';
                 });
@@ -458,7 +481,7 @@ export function finishHotfix(rootDir, hotfixTag) {
                         error += data;
                     });
                     ls3.on('exit', function (code) {
-                        let ls4 = spawn(gitExecutable, ['checkout', 'develop'], options);
+                        let ls4 = spawn(gitExecutable, ['checkout', configValues.develop], options);
                         ls4.stdout.on('data', function (data) {
                             log += data + '\n';
                         });
@@ -505,5 +528,4 @@ export function finishHotfix(rootDir, hotfixTag) {
         });
     });
 }
-
 

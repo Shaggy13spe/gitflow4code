@@ -8,7 +8,7 @@ import * as featureCommands from './commands/features';
 import * as releaseCommands from './commands/releases';
 import * as hotfixCommands from './commands/hotfixes';
 import * as gitCommands from './commands/gitCommands';
-import * as ConfigSettings from './settings/configSettings';
+import { ConfigSettings } from './settings/configSettings';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -18,21 +18,11 @@ export function activate(context: vscode.ExtensionContext) {
     // This line of code will only be executed once when your extension is activated
     console.log('Congratulations, your extension "gitflow4code" is now active!');
 
-    // launch.json configuration
-    const config = workspace.getConfiguration(); 
-
-    // retrieve values for gitflow4code
-    const configValues = config.get('gitflow4code') as ConfigSettings.ConfigSettings;
-
     // let featureFinisher = new FeatureStatusItem();
     // featureFinisher.showFeatureStatus();
 
     var outChannel;
     outChannel = vscode.window.createOutputChannel('Git');
-
-    //first we'll check to see if repo is initialized
-    // let developExists = initCommands.checkForInit(outChannel, configValues.develop);
-    // let masterExists = initCommands.checkForInit(outChannel, configValues.master);
 
     // The command has been defined in the package.json file
     // Now provide the implementation of the command with registerCommand
