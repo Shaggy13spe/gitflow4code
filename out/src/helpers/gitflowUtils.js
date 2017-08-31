@@ -305,7 +305,11 @@ function finishRelease(rootDir, releaseTag) {
                         error += data;
                     });
                     ls3.on('exit', function (code) {
-                        let ls4 = spawn(gitExecutable, ['tag', '-a', releaseTag], options);
+                        if (code > 0) {
+                            reject(error);
+                            return;
+                        }
+                        let ls4 = spawn(gitExecutable, ['tag', releaseTag], options);
                         ls4.stdout.on('data', function (data) {
                             log += data + '\n';
                         });
@@ -458,7 +462,11 @@ function finishHotfix(rootDir, hotfixTag) {
                         error += data;
                     });
                     ls3.on('exit', function (code) {
-                        let ls4 = spawn(gitExecutable, ['tag', '-a', hotfixTag], options);
+                        if (code > 0) {
+                            reject(error);
+                            return;
+                        }
+                        let ls4 = spawn(gitExecutable, ['tag', hotfixTag], options);
                         ls4.stdout.on('data', function (data) {
                             log += data + '\n';
                         });
