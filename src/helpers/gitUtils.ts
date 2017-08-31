@@ -171,3 +171,16 @@ export function getCurrentBranchName(rootDir) {
         });
     });
 }
+
+export function checkForBranch(rootDir, branchName) {
+    return getGitPath().then(function (gitExecutable) {
+        return new Promise(function (resolve, reject) {
+            let options = { cwd: rootDir };
+            let spawn = require('child_process').spawn;
+            let ls = spawn(gitExecutable, ['show-ref', '--verify', '--quiet', 'refs/heads/' + branchName], options);
+            ls.on('exit', function (code) {
+                resolve(code === 0);
+            });
+        });
+    });
+}

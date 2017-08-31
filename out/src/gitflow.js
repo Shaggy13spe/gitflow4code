@@ -14,18 +14,10 @@ function activate(context) {
     // Use the console to output diagnostic information (console.log) and errors (console.error)
     // This line of code will only be executed once when your extension is activated
     console.log('Congratulations, your extension "gitflow4code" is now active!');
-    const workspace = vscode.workspace;
-    // launch.json configuration
-    const config = workspace.getConfiguration();
-    // retrieve values for gitflow4code
-    const configValues = config.get('gitflow4code');
     // let featureFinisher = new FeatureStatusItem();
     // featureFinisher.showFeatureStatus();
     var outChannel;
     outChannel = vscode.window.createOutputChannel('Git');
-    //first we'll check to see if repo is initialized
-    // let developExists = initCommands.checkForInit(outChannel, configValues.develop);
-    // let masterExists = initCommands.checkForInit(outChannel, configValues.master);
     // The command has been defined in the package.json file
     // Now provide the implementation of the command with registerCommand
     // The commandId parameter must match the command field in package.json

@@ -64,9 +64,9 @@
                     "default": {
                         "develop": "develop",
                         "master": "master",
-                        "features": "feature",
-                        "releases": "release",
-                        "hotfixes": "hotfix"
+                        "features": "feature/",
+                        "releases": "release/",
+                        "hotfixes": "hotfix/"
                     }
                 }
             }
