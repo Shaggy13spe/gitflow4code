@@ -2,6 +2,7 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
+import { workspace } from 'vscode';
 import * as initCommands from './commands/init';
 import * as featureCommands from './commands/features';
 import * as releaseCommands from './commands/releases';
@@ -17,7 +18,6 @@ export function activate(context: vscode.ExtensionContext) {
     // This line of code will only be executed once when your extension is activated
     console.log('Congratulations, your extension "gitflow4code" is now active!');
 
-    const workspace = vscode.workspace;
     // launch.json configuration
     const config = workspace.getConfiguration(); 
 
