@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+
+## [0.1.3] - 2017-8-31
+### Fixed
+- Error when finishing Release or Hotfix with tagging
+
+## [0.1.2] - 2017-8-31
+### Added
+- Ability to initialize git flow repository settings using custom values
+
 ## [0.1.1] - 2017-8-30
 ### Added
 - Ability to initialize git flow repository settings

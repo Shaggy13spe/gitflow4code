@@ -11,9 +11,7 @@ Very basic support has been added allowing the user to:
 * Get the status of a git repository
 
 ### gitflow4code roadmap
-* Allow for custom initialization of repository
 * Allow feature branches to be based off of branches other than develop
-* Allow for release and hotfix branches to be tagged when finishing
 
 ## Dependencies
 * git (if you have installed VS Code, this should also already exist on your machine)
