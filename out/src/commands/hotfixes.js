@@ -1,7 +1,8 @@
 "use strict";
-var vscode = require('vscode');
-var gitflowUtils = require('../helpers/gitflowUtils');
-var gitUtils = require('../helpers/gitUtils');
+Object.defineProperty(exports, "__esModule", { value: true });
+const vscode = require("vscode");
+const gitflowUtils = require("../helpers/gitflowUtils");
+const gitUtils = require("../helpers/gitUtils");
 function run(outChannel) {
     var itemPickList = [
         {
@@ -18,9 +19,9 @@ function run(outChannel) {
             return;
         outChannel.clear();
         if (item.label === itemPickList[0].label)
-            vscode.window.showInputBox({ prompt: 'Name of Hotfix: ' }).then(function (val) { return startHotfix(outChannel, val); });
+            vscode.window.showInputBox({ prompt: 'Name of Hotfix: ' }).then(val => startHotfix(outChannel, val));
         else
-            vscode.window.showInputBox({ prompt: 'Tag this hotfix with: ' }).then(function (val) { return finishHotfix(outChannel, val); });
+            vscode.window.showInputBox({ prompt: 'Tag this hotfix with: ' }).then(val => finishHotfix(outChannel, val));
     });
 }
 exports.run = run;

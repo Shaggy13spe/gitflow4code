@@ -1,6 +1,7 @@
 "use strict";
-var vscode = require('vscode');
-var gitUtils = require('../helpers/gitUtils');
+Object.defineProperty(exports, "__esModule", { value: true });
+const vscode = require("vscode");
+const gitUtils = require("../helpers/gitUtils");
 function run(outChannel) {
     if (!vscode.window.activeTextEditor || !vscode.window.activeTextEditor.document)
         return;

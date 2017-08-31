@@ -90,6 +90,7 @@ export function getGitPath() {
 }
 
 export function getGitRepositoryPath(fileName) {
+    fileName += '/.';
     return getGitPath().then(function (gitExecutable) {
         return new Promise(function (resolve, reject) {
             let options = { cwd: path.dirname(fileName) };

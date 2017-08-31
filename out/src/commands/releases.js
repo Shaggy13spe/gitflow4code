@@ -1,7 +1,8 @@
 "use strict";
-var vscode = require('vscode');
-var gitflowUtils = require('../helpers/gitflowUtils');
-var gitUtils = require('../helpers/gitUtils');
+Object.defineProperty(exports, "__esModule", { value: true });
+const vscode = require("vscode");
+const gitflowUtils = require("../helpers/gitflowUtils");
+const gitUtils = require("../helpers/gitUtils");
 function run(outChannel) {
     var itemPickList = [
         {
@@ -18,9 +19,9 @@ function run(outChannel) {
             return;
         outChannel.clear();
         if (item.label === itemPickList[0].label)
-            vscode.window.showInputBox({ prompt: 'Name of Release: ' }).then(function (val) { return startRelease(outChannel, val); });
+            vscode.window.showInputBox({ prompt: 'Name of Release: ' }).then(val => startRelease(outChannel, val));
         else
-            vscode.window.showInputBox({ prompt: 'Tag this release with: ' }).then(function (val) { return finishRelease(outChannel, val); });
+            vscode.window.showInputBox({ prompt: 'Tag this release with: ' }).then(val => finishRelease(outChannel, val));
     });
 }
 exports.run = run;

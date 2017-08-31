@@ -3,7 +3,7 @@
     "displayName": "GitFlow 4 Code",
     "description": "Adds GitFlow support to VS Code",
     "icon": "images/gitflow.jpg",
-    "version": "0.0.5",
+    "version": "0.1.1",
     "publisher": "GreatMinds",
     "license": "SEE LICENSE IN LICENSE or README.MD",
     "homepage": "https://github.com/shaggy13spe/gitflow4code/blob/master/README.md",
@@ -28,7 +28,7 @@
         "theme": "dark"
     },
     "engines": {
-        "vscode": "^0.10.10"
+        "vscode": "^1.15.0"
     },
     "tags": [
         "git",
@@ -53,32 +53,53 @@
                 "command": "gitflow.GitFlow",
                 "when": "editorTextFocus"
             }
-        ]
+        ],
+        "configuration": {
+            "type": "object",
+            "title": "greatminds.gitflow4code",
+            "properties": {
+                "gitflow4code.init": {
+                    "type": "object",
+                    "description": "Initialization values for git flow branches",
+                    "default": {
+                        "develop": "develop",
+                        "master": "master",
+                        "features": "feature",
+                        "releases": "release",
+                        "hotfixes": "hotfix"
+                    }
+                }
+            }
+        }
     },
     "badges": [
         {
-            "url": "http://vsmarketplacebadge.apphb.com/version-short/GreatMinds.gitflow4code.svg",
+            "url": "https://vsmarketplacebadge.apphb.com/version-short/GreatMinds.gitflow4code.svg",
             "href": "https://marketplace.visualstudio.com/items?itemName=GreatMinds.gitflow4code",
             "description": "Extension version"
         },
         {
-            "url": "http://vsmarketplacebadge.apphb.com/installs/GreatMinds.gitflow4code.svg",
+            "url": "https://vsmarketplacebadge.apphb.com/installs/GreatMinds.gitflow4code.svg",
             "href": "https://marketplace.visualstudio.com/items?itemName=GreatMinds.gitflow4code",
             "description": "Extension installs"
         },
         {
-            "url": "http://vsmarketplacebadge.apphb.com/rating/GreatMinds.gitflow4code.svg",
+            "url": "https://vsmarketplacebadge.apphb.com/rating/GreatMinds.gitflow4code.svg",
             "href": "https://marketplace.visualstudio.com/items?itemName=GreatMinds.gitflow4code#review-details",
             "description": "Extension rating"
         }
     ],
     "scripts": {
-        "vscode:prepublish": "node ./node_modules/vscode/bin/compile",
-        "compile": "node ./node_modules/vscode/bin/compile -watch -p ./",
-        "postinstall": "node ./node_modules/vscode/bin/install"
+        "vscode:prepublish": "tsc -p ./",
+        "compile": "tsc -watch -p ./",
+        "postinstall": "node ./node_modules/vscode/bin/install",
+        "test": "node ./node_modules/vscode/bin/test"
     },
     "devDependencies": {
-        "typescript": "^1.8.5",
-        "vscode": "^0.11.0"
+        "typescript": "^2.0.3",
+        "vscode": "^1.1.0",
+        "mocha": "^2.3.3",
+        "@types/node": "^6.0.40",
+        "@types/mocha": "^2.2.32"
     }
 }
