@@ -1,6 +1,7 @@
 'use strict';
-var ConfigSettings = (function () {
-    function ConfigSettings() {
+Object.defineProperty(exports, "__esModule", { value: true });
+class ConfigSettings {
+    constructor() {
         this.develop = '';
         this.master = '';
         this.releases = '';
@@ -8,7 +9,6 @@ var ConfigSettings = (function () {
         this.features = '';
         this.support = '';
     }
-    return ConfigSettings;
-}());
+}
 exports.ConfigSettings = ConfigSettings;
 //# sourceMappingURL=configSettings.js.map

@@ -1,23 +1,24 @@
 'use strict';
+Object.defineProperty(exports, "__esModule", { value: true });
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
-var vscode = require('vscode');
-var initCommands = require('./commands/init');
-var featureCommands = require('./commands/features');
-var releaseCommands = require('./commands/releases');
-var hotfixCommands = require('./commands/hotfixes');
-var gitCommands = require('./commands/gitCommands');
+const vscode = require("vscode");
+const initCommands = require("./commands/init");
+const featureCommands = require("./commands/features");
+const releaseCommands = require("./commands/releases");
+const hotfixCommands = require("./commands/hotfixes");
+const gitCommands = require("./commands/gitCommands");
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 function activate(context) {
     // Use the console to output diagnostic information (console.log) and errors (console.error)
     // This line of code will only be executed once when your extension is activated
     console.log('Congratulations, your extension "gitflow4code" is now active!');
-    var workspace = vscode.workspace;
+    const workspace = vscode.workspace;
     // launch.json configuration
-    var config = workspace.getConfiguration();
+    const config = workspace.getConfiguration();
     // retrieve values for gitflow4code
-    var configValues = config.get('gitflow4code');
+    const configValues = config.get('gitflow4code');
     // let featureFinisher = new FeatureStatusItem();
     // featureFinisher.showFeatureStatus();
     var outChannel;
@@ -28,7 +29,7 @@ function activate(context) {
     // The command has been defined in the package.json file
     // Now provide the implementation of the command with registerCommand
     // The commandId parameter must match the command field in package.json
-    var disposable = vscode.commands.registerCommand('gitflow.GitFlow', function () {
+    let disposable = vscode.commands.registerCommand('gitflow.GitFlow', () => {
         // The code you place here will be executed every time your command is executed
         var itemPickList = [
             {
@@ -79,21 +80,18 @@ function activate(context) {
     context.subscriptions.push(disposable);
 }
 exports.activate = activate;
-var FeatureStatusItem = (function () {
-    function FeatureStatusItem() {
-    }
-    FeatureStatusItem.prototype.showFeatureStatus = function () {
+class FeatureStatusItem {
+    showFeatureStatus() {
         if (!this._statusBarItem)
             this._statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
         this._statusBarItem.text = 'feature test';
         this._statusBarItem.command = 'hello';
         this._statusBarItem.show();
-    };
-    FeatureStatusItem.prototype.dispose = function () {
+    }
+    dispose() {
         this._statusBarItem.dispose();
-    };
-    return FeatureStatusItem;
-}());
+    }
+}
 // this method is called when your extension is deactivated
 function deactivate() {
 }

@@ -1,7 +1,8 @@
 "use strict";
-var vscode = require('vscode');
-var gitflowUtils = require('../helpers/gitflowUtils');
-var gitUtils = require('../helpers/gitUtils');
+Object.defineProperty(exports, "__esModule", { value: true });
+const vscode = require("vscode");
+const gitflowUtils = require("../helpers/gitflowUtils");
+const gitUtils = require("../helpers/gitUtils");
 function run(outChannel) {
     var itemPickList = [
         {
@@ -18,7 +19,7 @@ function run(outChannel) {
             return;
         outChannel.clear();
         if (item.label === itemPickList[0].label)
-            vscode.window.showInputBox({ prompt: 'Name of Feature: ' }).then(function (val) { return startFeature(outChannel, val); });
+            vscode.window.showInputBox({ prompt: 'Name of Feature: ' }).then(val => startFeature(outChannel, val));
         else
             finishFeature(outChannel);
     });
@@ -26,7 +27,7 @@ function run(outChannel) {
 exports.run = run;
 function startFeature(outChannel, featureName) {
     gitUtils.getGitRepositoryPath(vscode.workspace.rootPath).then(function (gitRepositoryPath) {
-        gitflowUtils.startFeature(gitRepositoryPath, featureName).then(startFeature, genericErrorHandler);
+        gitflowUtils.startFeature(gitRepositoryPath, featureName, null).then(startFeature, genericErrorHandler);
         function startFeature(log) {
             if (log.length === 0) {
                 vscode.window.showInformationMessage('Nothing to show');

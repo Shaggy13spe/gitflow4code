@@ -1,13 +1,19 @@
 "use strict";
-var vscode = require('vscode');
-var gitflowUtils = require('../helpers/gitflowUtils');
-var gitUtils = require('../helpers/gitUtils');
+Object.defineProperty(exports, "__esModule", { value: true });
+const vscode = require("vscode");
+const gitflowUtils = require("../helpers/gitflowUtils");
+const gitUtils = require("../helpers/gitUtils");
 function run(outChannel) {
     var itemPickList = [
         {
             label: "Initialize with defaults",
             description: "Initialize gitflow with [develop], [master], [feature], [release], and [hotfix]"
         }
+        // ,
+        // {
+        //     label: "Initialize with custom values",
+        //     description: "Initialize gitflow with custom values"
+        // }
     ];
     vscode.window.showQuickPick(itemPickList).then(function (item) {
         if (!item)
