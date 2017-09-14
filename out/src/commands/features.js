@@ -123,6 +123,9 @@ function finishFeature(outChannel) {
                         vscode.window.showInformationMessage('Nothing to show');
                         return;
                     }
+                    let featureIndex = featuresConfig.indexOf(featureSetting);
+                    featuresConfig.splice(featureIndex, 1);
+                    config.update('gitflow4code.features', featuresConfig);
                     outChannel.append(log);
                     outChannel.show();
                 }

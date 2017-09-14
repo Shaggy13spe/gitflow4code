@@ -129,13 +129,17 @@ function finishFeature(outChannel) {
                 let featureSetting = featuresConfig.find((feature) => feature.name === branchName.toString());
                 if(!featureSetting) 
                     featureSetting = new FeatureSetting(branchName.toString(), configValues.develop);
-                    
+
                 gitflowUtils.finishFeature(gitRepositoryPath, branchName.toString(), featureSetting.base).then(finishFeature, genericErrorHandler);
                 function finishFeature(log) {
                     if(log.length === 0) {
                         vscode.window.showInformationMessage('Nothing to show');
                         return;
                     }
+
+                    let featureIndex = featuresConfig.indexOf(featureSetting);
+                    featuresConfig.splice(featureIndex, 1);
+                    config.update('gitflow4code.features', featuresConfig);
                     
                     outChannel.append(log);
                     outChannel.show();
