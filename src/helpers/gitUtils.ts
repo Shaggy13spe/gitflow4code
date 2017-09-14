@@ -166,7 +166,7 @@ export function getCurrentBranchName(rootDir) {
                     reject(error);
                     return;
                 }
-                resolve(log);
+                resolve(log.replace(/ /g,'').trim().split('\n')[0]);
             });
         });
     });
@@ -180,6 +180,33 @@ export function checkForBranch(rootDir, branchName) {
             let ls = spawn(gitExecutable, ['show-ref', '--verify', '--quiet', 'refs/heads/' + branchName], options);
             ls.on('exit', function (code) {
                 resolve(code === 0);
+            });
+        });
+    });
+}
+
+export function getBranchList(rootDir) {
+    return getGitPath().then(function (gitExecutable) {
+        return new Promise(function (resolve, reject) {
+            let options = { cwd: rootDir };
+            let util = require('util');
+            let spawn = require('child_process').spawn;
+            let ls = spawn(gitExecutable, ['branch'], options);
+            let log = '';
+            let error = '';
+            ls.stdout.on('data', function (data) {
+                log += data;
+
+            });
+            ls.stderr.on('data', function (data) {
+                error += data;
+            });
+            ls.on('exit', function (data) {
+                if(error.length > 0) {
+                    reject(error);
+                    return;
+                }
+                resolve(log.split('\n'));
             });
         });
     });

@@ -6,6 +6,7 @@ import * as child_process_1 from 'child_process';
 import * as fs from 'fs';
 import * as gitUtils from '../helpers/gitUtils';
 import { ConfigSettings } from '../settings/configSettings';
+import { FeatureSetting } from '../settings/featureSettings';
 
 /*
 A branch name can not:
@@ -156,40 +157,27 @@ export function startFeature(rootDir, featureName, baseBranch) {
     });
 }
 
-export function finishFeature(rootDir) {
+export function finishFeature(rootDir, featureName, baseBranch) {
     return gitUtils.getGitPath().then(function (gitExecutable) {
         return new Promise(function(resolve, reject) {
             let options = { cwd: rootDir };
             let spawn = require('child_process').spawn;
-            let ls1 = spawn(gitExecutable, ['rev-parse', '--abbrev-ref', 'HEAD'], options);
-            var branchData = '';
-            var inFeature = false;
-            var currentBranch = '';
             let log = '';
             let error = '';
+            let ls1 = spawn(gitExecutable, ['checkout', baseBranch], options);
             ls1.stdout.on('data', function (data) {
-                branchData += data;
+                log += data + '\n';
             });
             ls1.stderr.on('data', function (data) {
                 error += data;
             });
-            ls1.on('exit', function(code) {
+            ls1.on('exit', function (code) {
                 if(code > 0) {
                     reject(error);
                     return;
                 }
 
-                currentBranch = branchData.replace(/ /g,'').trim().split('\n')[0];
-                const config = workspace.getConfiguration(); 
-                const configValues = config.get('gitflow4code.init') as ConfigSettings;
-                const featurePrefix = configValues.features;
-                inFeature = currentBranch.startsWith(featurePrefix);
-
-                if(!inFeature) {
-                    reject('Not currently on a Feature branch');
-                    return;
-                }
-                let ls2 = spawn(gitExecutable, ['checkout', configValues.develop], options);
+                let ls2 = spawn(gitExecutable, ['merge', '--no-ff', featureName], options);
                 ls2.stdout.on('data', function (data) {
                     log += data + '\n';
                 });
@@ -197,12 +185,7 @@ export function finishFeature(rootDir) {
                     error += data;
                 });
                 ls2.on('exit', function (code) {
-                    if(code > 0) {
-                        reject(error);
-                        return;
-                    }
-    
-                    let ls3 = spawn(gitExecutable, ['merge', '--no-ff', currentBranch], options);
+                    let ls3 = spawn(gitExecutable, ['branch', '-d', featureName], options);
                     ls3.stdout.on('data', function (data) {
                         log += data + '\n';
                     });
@@ -210,24 +193,15 @@ export function finishFeature(rootDir) {
                         error += data;
                     });
                     ls3.on('exit', function (code) {
-                        let ls4 = spawn(gitExecutable, ['branch', '-d', currentBranch], options);
-                        ls4.stdout.on('data', function (data) {
-                            log += data + '\n';
-                        });
-                        ls4.stderr.on('data', function (data) {
-                            error += data;
-                        });
-                        ls4.on('exit', function (code) {
-                            if(code > 0) {
-                                reject(error);
-                                return;
-                            }
-                            var message = log;
-                            if(code === 0 && error.length > 0)
-                                message += '\n\n' + error;
-                                
-                            resolve(message);
-                        });
+                        if(code > 0) {
+                            reject(error);
+                            return;
+                        }
+                        var message = log;
+                        if(code === 0 && error.length > 0)
+                            message += '\n\n' + error;
+                            
+                        resolve(message);
                     });
                 });
             });
