@@ -10,7 +10,7 @@ const configValues = config.get('gitflow4code.init');
 function run(outChannel) {
     var itemPickList = [
         {
-            label: 'Start Feature from develop',
+            label: 'Start Feature from ' + configValues.develop,
             description: ''
         },
         {
