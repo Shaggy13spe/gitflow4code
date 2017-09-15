@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.0.0] - 2017-9-14
+### Added
+- Ability to create feature branches based on branches other than "development" branch
+
+### Changed
+- Edited the README.md to be more robust on how to use the extension
 
 ## [0.1.3] - 2017-8-31
 ### Fixed
