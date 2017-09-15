@@ -68,6 +68,25 @@
                         "releases": "release/",
                         "hotfixes": "hotfix/"
                     }
+                },
+                "gitflow4code.features": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "title": "feature/base pairs",
+                        "properties": {
+                            "name": {
+                                "type": "string",
+                                "description": "Name of feature branch"
+                            },
+                            "base": {
+                                "type": "string",
+                                "description": "Name of branch feature is based from"
+                            }
+                        }
+                    },
+                    "description": "maps base branch to features",
+                    "default": []
                 }
             }
         }
