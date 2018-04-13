@@ -87,6 +87,44 @@
                     },
                     "description": "maps base branch to features",
                     "default": []
+                },
+                "gitflow4code.releases": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "title": "release/base pairs",
+                        "properties": {
+                            "name": {
+                                "type": "string",
+                                "description": "Name of release branch"
+                            },
+                            "base": {
+                                "type": "string",
+                                "description": "Name of branch release is based from"
+                            }
+                        }
+                    },
+                    "description": "maps base branch to releases",
+                    "default": []
+                },
+                "gitflow4code.hotfixes": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "title": "hotfix/base pairs",
+                        "properties": {
+                            "name": {
+                                "type": "string",
+                                "description": "Name of hotfix branch"
+                            },
+                            "base": {
+                                "type": "string",
+                                "description": "Name of branch hotfix is based from"
+                            }
+                        }
+                    },
+                    "description": "maps base branch to hotfixes",
+                    "default": []
                 }
             }
         }
