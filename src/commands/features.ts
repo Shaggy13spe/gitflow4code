@@ -4,7 +4,7 @@ import * as gitflowUtils from '../helpers/gitflowUtils';
 import * as gitUtils from '../helpers/gitUtils';
 import * as path from 'path';
 import { ConfigSettings } from '../settings/configSettings';
-import { FeatureSetting } from '../settings/featureSettings';
+import { BranchSetting } from '../settings/branchSettings';
 
 const config = workspace.getConfiguration(); 
 const configValues = config.get('gitflow4code.init') as ConfigSettings;
@@ -16,7 +16,7 @@ export function run(outChannel) {
                 description: ''
             },
             { 
-                label: 'Start Feature from another feature branch',
+                label: 'Start Feature from another base branch',
                 description: ''
             },
             {
@@ -45,8 +45,8 @@ function getBranchNames(outChannel, branchName) {
             var branchList = branches as string[];
             
             var filteredBranchList = branchList.map((value) => {
-                if(value.replace('*', '').trim() === configValues.develop || value.replace('*', '').trim().startsWith(configValues.features))
-                    return value.replace('*', '').trim();
+                // if(value.replace('*', '').trim() === configValues.develop || value.replace('*', '').trim().startsWith(configValues.features))
+                return value.replace('*', '').trim();
             }).filter(x => !!x);
         
             var branchPickList = [];
@@ -78,39 +78,30 @@ function getBranchNames(outChannel, branchName) {
 }
 
 function startFeature(outChannel, featureName, baseBranch) {
-    gitUtils.getGitRepositoryPath(vscode.workspace.rootPath).then(function (gitRepositoryPath) {
-        gitflowUtils.startFeature(gitRepositoryPath, featureName, baseBranch).then(startFeature, genericErrorHandler);
-            function startFeature(log) {
-                if(log.length === 0) {
-                    vscode.window.showInformationMessage('Nothing to show');
-                    return;
-                }
+    if(featureName !== undefined) // User chose to Cancel/Esc operation
+        if(featureName !== '')
+            gitUtils.getGitRepositoryPath(vscode.workspace.rootPath).then(function (gitRepositoryPath) {
+                gitflowUtils.startFeature(gitRepositoryPath, featureName, baseBranch)
+                    .then(startFeature, genericErrorHandler)
+                    .catch(genericErrorHandler)
+            }).catch(genericErrorHandler);
+        else
+            genericErrorHandler('Name of feature cannot be blank');
 
-                let featuresConfig = config.get('gitflow4code.features') as FeatureSetting[];
-                featuresConfig.push(new FeatureSetting(configValues.features + featureName, baseBranch));
-                config.update('gitflow4code.features', featuresConfig);
-                
-                outChannel.append(log);
-                outChannel.show();
-            }
-            function genericErrorHandler(error) {
-                if(error.code && error.syscall && error.code === 'ENOENT' && error.syscall === 'spawn git')
-                    vscode.window.showErrorMessage('Cannot find git installation');
-                else {
-                    outChannel.appendLine(error);
-                    outChannel.show();
-                    vscode.window.showErrorMessage('There was an error, please view details in output log');
-                }
-            } 
-        }).catch(function (error) {
-            if(error.code && error.syscall && error.code === 'ENOENT' && error.syscall === 'spawn git')
-                vscode.window.showErrorMessage('Cannot find git installation');
-            else {
-                outChannel.appendLine(error);
-                outChannel.show();
-                vscode.window.showErrorMessage('There was an error, please view details in output log');
-            }
-    }).catch(function (error) {
+    function startFeature(log) {
+        if(log.length === 0) {
+            vscode.window.showInformationMessage('Nothing to show');
+            return;
+        }
+
+        let featuresConfig = config.get('gitflow4code.features') as BranchSetting[];
+        featuresConfig.push(new BranchSetting(configValues.features + featureName, baseBranch));
+        config.update('gitflow4code.features', featuresConfig);
+        
+        outChannel.append(log);
+        outChannel.show();
+    }
+    function genericErrorHandler(error) {
         if(error.code && error.syscall && error.code === 'ENOENT' && error.syscall === 'spawn git')
             vscode.window.showErrorMessage('Cannot find git installation');
         else {
@@ -118,17 +109,17 @@ function startFeature(outChannel, featureName, baseBranch) {
             outChannel.show();
             vscode.window.showErrorMessage('There was an error, please view details in output log');
         }
-    });
+    } 
 }
 
 function finishFeature(outChannel) {
     gitUtils.getGitRepositoryPath(vscode.workspace.rootPath).then(function (gitRepositoryPath) {
         gitUtils.getCurrentBranchName(vscode.workspace.rootPath).then((branchName) => {
             if(branchName.toString().startsWith(configValues.features)) {
-                let featuresConfig = config.get('gitflow4code.features') as FeatureSetting[];
+                let featuresConfig = config.get('gitflow4code.features') as BranchSetting[];
                 let featureSetting = featuresConfig.find((feature) => feature.name === branchName.toString());
                 if(!featureSetting) 
-                    featureSetting = new FeatureSetting(branchName.toString(), configValues.develop);
+                    featureSetting = new BranchSetting(branchName.toString(), configValues.develop);
 
                 gitflowUtils.finishFeature(gitRepositoryPath, branchName.toString(), featureSetting.base).then(finishFeature, genericErrorHandler);
                 function finishFeature(log) {
@@ -144,20 +135,14 @@ function finishFeature(outChannel) {
                     outChannel.append(log);
                     outChannel.show();
                 }
-                function genericErrorHandler(error) {
-                    if(error.code && error.syscall && error.code === 'ENOENT' && error.syscall === 'spawn git')
-                        vscode.window.showErrorMessage('Cannot find git installation');
-                    else {
-                        outChannel.appendLine(error);
-                        outChannel.show();
-                        vscode.window.showErrorMessage('There was an error, please view details in output log');
-                    }
-                } 
+                 
             }
             else 
                 vscode.window.showErrorMessage('Not currently on a Feature branch');
         })
-    }).catch(function (error) {
+    }).catch(genericErrorHandler);
+    
+    function genericErrorHandler(error) {
         if(error.code && error.syscall && error.code === 'ENOENT' && error.syscall === 'spawn git')
             vscode.window.showErrorMessage('Cannot find git installation');
         else {
@@ -165,5 +150,5 @@ function finishFeature(outChannel) {
             outChannel.show();
             vscode.window.showErrorMessage('There was an error, please view details in output log');
         }
-    });
+    }
 }

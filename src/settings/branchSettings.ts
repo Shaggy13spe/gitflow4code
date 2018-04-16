@@ -1,6 +1,6 @@
 'use strict';
 
-export class FeatureSetting {
+export class BranchSetting {
 
     constructor(name: string, base: string) {
         this.name = name;
