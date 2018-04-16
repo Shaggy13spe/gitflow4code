@@ -16,7 +16,7 @@ export function run(outChannel) {
                 description: ''
             },
             { 
-                label: 'Start Feature from another feature branch',
+                label: 'Start Feature from another base branch',
                 description: ''
             },
             {
