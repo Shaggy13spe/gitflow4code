@@ -45,8 +45,8 @@ function getBranchNames(outChannel, branchName) {
             var branchList = branches as string[];
             
             var filteredBranchList = branchList.map((value) => {
-                if(value.replace('*', '').trim() !== configValues.master && !value.replace('*', '').trim().startsWith(configValues.hotfixes))
-                    return value.replace('*', '').trim();
+                // if(value.replace('*', '').trim() !== configValues.master && !value.replace('*', '').trim().startsWith(configValues.hotfixes))
+                return value.replace('*', '').trim();
             }).filter(x => !!x);
         
             var branchPickList = [];
@@ -78,11 +78,15 @@ function getBranchNames(outChannel, branchName) {
 }
 
 function startRelease(outChannel, releaseName, baseBranch) {
-    gitUtils.getGitRepositoryPath(vscode.workspace.rootPath).then(function (gitRepositoryPath) {
-        gitflowUtils.startRelease(gitRepositoryPath, releaseName, baseBranch)
-            .then(startRelease, genericErrorHandler)
-            .catch(genericErrorHandler)
-    }).catch(genericErrorHandler);
+    if(releaseName !== undefined) // User chose to Cancel/Esc operation
+        if(releaseName !== '')
+            gitUtils.getGitRepositoryPath(vscode.workspace.rootPath).then(function (gitRepositoryPath) {
+                gitflowUtils.startRelease(gitRepositoryPath, releaseName, baseBranch)
+                    .then(startRelease, genericErrorHandler)
+                    .catch(genericErrorHandler)
+            }).catch(genericErrorHandler);
+        else
+            genericErrorHandler('Name of release cannot be blank');
 
     function startRelease(log) {
         if(log.length === 0) {

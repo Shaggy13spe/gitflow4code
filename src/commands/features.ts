@@ -45,8 +45,8 @@ function getBranchNames(outChannel, branchName) {
             var branchList = branches as string[];
             
             var filteredBranchList = branchList.map((value) => {
-                if(value.replace('*', '').trim() === configValues.develop || value.replace('*', '').trim().startsWith(configValues.features))
-                    return value.replace('*', '').trim();
+                // if(value.replace('*', '').trim() === configValues.develop || value.replace('*', '').trim().startsWith(configValues.features))
+                return value.replace('*', '').trim();
             }).filter(x => !!x);
         
             var branchPickList = [];
@@ -78,11 +78,15 @@ function getBranchNames(outChannel, branchName) {
 }
 
 function startFeature(outChannel, featureName, baseBranch) {
-    gitUtils.getGitRepositoryPath(vscode.workspace.rootPath).then(function (gitRepositoryPath) {
-        gitflowUtils.startFeature(gitRepositoryPath, featureName, baseBranch)
-            .then(startFeature, genericErrorHandler)
-            .catch(genericErrorHandler)
-    }).catch(genericErrorHandler);
+    if(featureName !== undefined) // User chose to Cancel/Esc operation
+        if(featureName !== '')
+            gitUtils.getGitRepositoryPath(vscode.workspace.rootPath).then(function (gitRepositoryPath) {
+                gitflowUtils.startFeature(gitRepositoryPath, featureName, baseBranch)
+                    .then(startFeature, genericErrorHandler)
+                    .catch(genericErrorHandler)
+            }).catch(genericErrorHandler);
+        else
+            genericErrorHandler('Name of feature cannot be blank');
 
     function startFeature(log) {
         if(log.length === 0) {

@@ -28,6 +28,8 @@ function run(outChannel) {
         outChannel.clear();
         if (item.label === itemPickList[0].label)
             vscode.window.showInputBox({ prompt: 'Name of Hotfix: ' }).then(val => startHotfix(outChannel, val, configValues.master));
+        else if (item.label === itemPickList[1].label)
+            getBranchNames(outChannel, item.label);
         else
             vscode.window.showInputBox({ prompt: 'Tag this hotfix with: ' }).then(val => finishHotfix(outChannel, val));
     });
@@ -38,8 +40,8 @@ function getBranchNames(outChannel, branchName) {
         gitUtils.getBranchList(gitRepositoryPath).then((branches) => {
             var branchList = branches;
             var filteredBranchList = branchList.map((value) => {
-                if (value.replace('*', '').trim() !== configValues.develop || value.replace('*', '').trim().startsWith(configValues.hotfixes))
-                    return value.replace('*', '').trim();
+                // if(value.replace('*', '').trim() !== configValues.develop || value.replace('*', '').trim().startsWith(configValues.hotfixes))
+                return value.replace('*', '').trim();
             }).filter(x => !!x);
             var branchPickList = [];
             filteredBranchList.forEach(branchName => {
@@ -67,11 +69,15 @@ function getBranchNames(outChannel, branchName) {
     }
 }
 function startHotfix(outChannel, hotfixName, baseBranch) {
-    gitUtils.getGitRepositoryPath(vscode.workspace.rootPath).then(function (gitRepositoryPath) {
-        gitflowUtils.startHotfix(gitRepositoryPath, hotfixName, baseBranch)
-            .then(startHotfix, genericErrorHandler)
-            .catch(genericErrorHandler);
-    }).catch(genericErrorHandler);
+    if (hotfixName !== undefined)
+        if (hotfixName !== '')
+            gitUtils.getGitRepositoryPath(vscode.workspace.rootPath).then(function (gitRepositoryPath) {
+                gitflowUtils.startHotfix(gitRepositoryPath, hotfixName, baseBranch)
+                    .then(startHotfix, genericErrorHandler)
+                    .catch(genericErrorHandler);
+            }).catch(genericErrorHandler);
+        else
+            genericErrorHandler('Name of hotfix cannot be blank');
     function startHotfix(log) {
         if (log.length === 0) {
             vscode.window.showInformationMessage('Nothing to show');
