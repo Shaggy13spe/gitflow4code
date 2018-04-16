@@ -4,9 +4,9 @@ This extension adds support for the feature branching strategy described here in
 
 ### What's included
 * Initialize a repository with default or custom values for branch naming (i.e. 'develop', 'master', 'feature/', etc)
-* Start/Finish Feature branches from develop, or from other feature branch bases
-* Start/Finish Release branches
-* Start/Finish Hotfix branches
+* Start/Finish Feature branches from "development", or from other branch bases
+* Start/Finish Release branches from "development", or from other branch bases
+* Start/Finish Hotfix branches from "production", or from other branch bases
 * Get the status of a git repository
 
 #### Dependencies
@@ -24,7 +24,7 @@ Alternately, you can use the shortcut keys listed below to display the gitflow4c
 
 ![Available GitFlow Commands](images/Initialize-Command.png)
 
-## Initalize
+## Initialize
 Choose the Initialize Repository command from the list of available gitflow4code commands.
 ![Available GitFlow Commands](images/Initialize-Command.png)
 
@@ -54,8 +54,8 @@ If creating a feature branch off of your development branch, choose `Start Featu
 
  -- or --
 
-If creating a feature branch off another existing feature branch, choose `Start Feature from another feature branch`
-![Start Feature from another feature](images/StartFeatureBase.png)
+If creating a feature branch off another base branch, choose `Start Feature from branch`
+![Start Feature from another base branch](images/StartFeatureBase.png)
 
 
 Then supply the name of your feature branch, and the tool will prefix it with whatever you chose to be the name of your feature branches
@@ -70,8 +70,13 @@ When finished with your feature, choose the `Features` command from the list of 
 Choose the `Releases` command from the list of available gitflow4code commands
 ![Releases Command](images/Release-Command.png)
 
-Choose `Start Release`
-![Start Release](images/StartRelease.png)
+If creating a release branch off of your development branch, choose `Start Release from <develop>` (where `develop` is the name of whatever you chose to initialize your development branch) 
+![Start Release](images/StartReleaseDevelop.png)
+
+ -- or --
+
+If creating a release branch off another base branch, choose `Start Release from another branch`
+![Start Release from another base branch](images/StartReleaseBase.png)
 
 Then supply the name of your release branch, and the tool will prefix it with whatever you chose to be the name of your release branches
 ![Release Name](images/ReleaseName.png)
@@ -88,8 +93,13 @@ Then supply the name of the `Tag` for this release
 Choose the `Hotfixes` command from the list of available gitflow4code commands
 ![Hotfixes Command](images/Hotfix-Command.png)
 
-Choose `Start Hotfix`
-![Start Hotfix](images/StartHotfix.png)
+If creating a hotfix branch off of your production branch, choose `Start Hotfix from <master>` (where `master` is the name of whatever you chose to initialize your production branch) 
+![Start Hotfix](images/StartHotfixMaster.png)
+
+ -- or --
+
+If creating a hotfix branch off another base branch, choose `Start Hotfix from another branch`
+![Start Hotfix from another base branch](images/StartHotfixBase.png)
 
 Then supply the name of your hotfix branch, and the tool will prefix it with whatever you chose to be the name of your hotfix branches
 ![Hotfix Name](images/HotfixName.png)
@@ -112,7 +122,7 @@ Choosing this from the gitflow4code commands list will display the current statu
 ## gitflow4code roadmap
 * Redesign command menu
 * Add shortcut functionality to finish current feature/release/hotfix via a status bar button
-* Ability to configure whether or not branches are local and/or remote tracking branches are deleted after finishing
+* Ability to configure whether or not local branches and/or remote tracking branches are deleted after finishing
 
 ## Help Out?
 This project is under constant development. Feedback and suggestions are very welcome and I encourage you to use the [Issues](https://github.com/Shaggy13spe/gitflow4code/issues) list on Github to provide that feedback.
