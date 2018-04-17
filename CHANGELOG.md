@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [1.0.1] - 2018-4-16
+## [1.1.0] - 2018-4-16
 ### Added
 - Ability to create release and/or hotfix branches based on branches other than default branch ("development" and "production" respectively)
 ### Changed
