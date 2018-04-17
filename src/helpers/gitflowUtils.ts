@@ -6,7 +6,7 @@ import * as child_process_1 from 'child_process';
 import * as fs from 'fs';
 import * as gitUtils from '../helpers/gitUtils';
 import { ConfigSettings } from '../settings/configSettings';
-import { FeatureSetting } from '../settings/featureSettings';
+import { BranchSetting } from '../settings/branchSettings';
 
 /*
 A branch name can not:
@@ -209,12 +209,13 @@ export function finishFeature(rootDir, featureName, baseBranch) {
     });
 }
 
-export function startRelease(rootDir, releaseName) {
+export function startRelease(rootDir, releaseName, baseBranch) {
     return gitUtils.getGitPath().then(function (gitExecutable) {
         return new Promise(function (resolve, reject) {
             const config = workspace.getConfiguration(); 
             const configValues = config.get('gitflow4code.init') as ConfigSettings;
             const releasePrefix = configValues.releases;
+
             releaseName = releaseName.replace(/ /g, '_');
             
             if(hasIllegalChars(releaseName)) 
@@ -227,9 +228,12 @@ export function startRelease(rootDir, releaseName) {
                     '\t- End with ".lock"\n' +
                     '\t- Contain a "\" (backslash))');
             else {
+                if(!baseBranch)
+                    baseBranch = configValues.develop;
+
                 let options = { cwd: rootDir };
                 let spawn = require('child_process').spawn;
-                let ls = spawn(gitExecutable, ['checkout', '-b', releasePrefix + releaseName, configValues.develop], options);
+                let ls = spawn(gitExecutable, ['checkout', '-b', releasePrefix + releaseName, baseBranch], options);
                 let log = '';
                 let error = '';
                 ls.stdout.on('data', function (data) {
@@ -254,7 +258,7 @@ export function startRelease(rootDir, releaseName) {
     });
 }
 
-export function finishRelease(rootDir, releaseTag) {
+export function finishRelease(rootDir, baseBranch, releaseTag) {
     return gitUtils.getGitPath().then(function (gitExecutable) {
         return new Promise(function(resolve, reject) {
             let options = { cwd: rootDir };
@@ -326,7 +330,7 @@ export function finishRelease(rootDir, releaseTag) {
                                 return;
                             }
             
-                            let ls5 = spawn(gitExecutable, ['checkout', configValues.develop], options);
+                            let ls5 = spawn(gitExecutable, ['checkout', baseBranch], options);
                             ls5.stdout.on('data', function (data) {
                                 log += data + '\n';
                             });
@@ -375,12 +379,13 @@ export function finishRelease(rootDir, releaseTag) {
     });
 }
 
-export function startHotfix(rootDir, hotfixName) {
+export function startHotfix(rootDir, hotfixName, baseBranch) {
     return gitUtils.getGitPath().then(function (gitExecutable) {
         return new Promise(function (resolve, reject) {
             const config = workspace.getConfiguration(); 
             const configValues = config.get('gitflow4code.init') as ConfigSettings;
             const hotfixPrefix = configValues.hotfixes;
+
             hotfixName = hotfixName.replace(/ /g, '_');
             
             if(hasIllegalChars(hotfixName)) 
@@ -393,9 +398,12 @@ export function startHotfix(rootDir, hotfixName) {
                     '\t- End with ".lock"\n' +
                     '\t- Contain a "\" (backslash))');
             else {
+                if(!baseBranch)
+                    baseBranch = configValues.master;
+
                 let options = { cwd: rootDir };
                 let spawn = require('child_process').spawn;
-                let ls = spawn(gitExecutable, ['checkout', '-b', hotfixPrefix + hotfixName, configValues.master], options);
+                let ls = spawn(gitExecutable, ['checkout', '-b', hotfixPrefix + hotfixName, baseBranch], options);
                 let log = '';
                 let error = '';
                 ls.stdout.on('data', function (data) {
@@ -420,7 +428,7 @@ export function startHotfix(rootDir, hotfixName) {
     });
 }
 
-export function finishHotfix(rootDir, hotfixTag) {
+export function finishHotfix(rootDir, baseBranch, hotfixTag) {
     return gitUtils.getGitPath().then(function (gitExecutable) {
         return new Promise(function(resolve, reject) {
             let options = { cwd: rootDir };
@@ -453,7 +461,7 @@ export function finishHotfix(rootDir, hotfixTag) {
                     reject('Not currently on a Hotfix branch');
                     return;
                 }
-                let ls2 = spawn(gitExecutable, ['checkout', configValues.master], options);
+                let ls2 = spawn(gitExecutable, ['checkout', baseBranch], options);
                 ls2.stdout.on('data', function (data) {
                     log += data + '\n';
                 });

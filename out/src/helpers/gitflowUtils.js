@@ -186,7 +186,7 @@ function finishFeature(rootDir, featureName, baseBranch) {
     });
 }
 exports.finishFeature = finishFeature;
-function startRelease(rootDir, releaseName) {
+function startRelease(rootDir, releaseName, baseBranch) {
     return gitUtils.getGitPath().then(function (gitExecutable) {
         return new Promise(function (resolve, reject) {
             const config = vscode_1.workspace.getConfiguration();
@@ -203,9 +203,11 @@ function startRelease(rootDir, releaseName) {
                     '\t- End with ".lock"\n' +
                     '\t- Contain a "\" (backslash))');
             else {
+                if (!baseBranch)
+                    baseBranch = configValues.develop;
                 let options = { cwd: rootDir };
                 let spawn = require('child_process').spawn;
-                let ls = spawn(gitExecutable, ['checkout', '-b', releasePrefix + releaseName, configValues.develop], options);
+                let ls = spawn(gitExecutable, ['checkout', '-b', releasePrefix + releaseName, baseBranch], options);
                 let log = '';
                 let error = '';
                 ls.stdout.on('data', function (data) {
@@ -229,7 +231,7 @@ function startRelease(rootDir, releaseName) {
     });
 }
 exports.startRelease = startRelease;
-function finishRelease(rootDir, releaseTag) {
+function finishRelease(rootDir, baseBranch, releaseTag) {
     return gitUtils.getGitPath().then(function (gitExecutable) {
         return new Promise(function (resolve, reject) {
             let options = { cwd: rootDir };
@@ -296,7 +298,7 @@ function finishRelease(rootDir, releaseTag) {
                                 reject(error);
                                 return;
                             }
-                            let ls5 = spawn(gitExecutable, ['checkout', configValues.develop], options);
+                            let ls5 = spawn(gitExecutable, ['checkout', baseBranch], options);
                             ls5.stdout.on('data', function (data) {
                                 log += data + '\n';
                             });
@@ -343,7 +345,7 @@ function finishRelease(rootDir, releaseTag) {
     });
 }
 exports.finishRelease = finishRelease;
-function startHotfix(rootDir, hotfixName) {
+function startHotfix(rootDir, hotfixName, baseBranch) {
     return gitUtils.getGitPath().then(function (gitExecutable) {
         return new Promise(function (resolve, reject) {
             const config = vscode_1.workspace.getConfiguration();
@@ -360,9 +362,11 @@ function startHotfix(rootDir, hotfixName) {
                     '\t- End with ".lock"\n' +
                     '\t- Contain a "\" (backslash))');
             else {
+                if (!baseBranch)
+                    baseBranch = configValues.master;
                 let options = { cwd: rootDir };
                 let spawn = require('child_process').spawn;
-                let ls = spawn(gitExecutable, ['checkout', '-b', hotfixPrefix + hotfixName, configValues.master], options);
+                let ls = spawn(gitExecutable, ['checkout', '-b', hotfixPrefix + hotfixName, baseBranch], options);
                 let log = '';
                 let error = '';
                 ls.stdout.on('data', function (data) {
@@ -386,7 +390,7 @@ function startHotfix(rootDir, hotfixName) {
     });
 }
 exports.startHotfix = startHotfix;
-function finishHotfix(rootDir, hotfixTag) {
+function finishHotfix(rootDir, baseBranch, hotfixTag) {
     return gitUtils.getGitPath().then(function (gitExecutable) {
         return new Promise(function (resolve, reject) {
             let options = { cwd: rootDir };
@@ -417,7 +421,7 @@ function finishHotfix(rootDir, hotfixTag) {
                     reject('Not currently on a Hotfix branch');
                     return;
                 }
-                let ls2 = spawn(gitExecutable, ['checkout', configValues.master], options);
+                let ls2 = spawn(gitExecutable, ['checkout', baseBranch], options);
                 ls2.stdout.on('data', function (data) {
                     log += data + '\n';
                 });

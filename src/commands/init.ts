@@ -62,7 +62,7 @@ function setHotfix(outChannel, configSettings, val) {
     const configValues = config.get('gitflow4code.init') as ConfigSettings;
     config.update('gitflow4code.init', configSettings, vscode.ConfigurationTarget.Workspace);
     gitUtils.getGitRepositoryPath(vscode.workspace.rootPath).then(function(getGitRepositoryPath) {
-        gitflowUtils.initializeRepository(getGitRepositoryPath).then(initializeSuccess, initializeFailed);
+        gitflowUtils.initializeRepository(getGitRepositoryPath).then(initializeSuccess, genericErrorHandler);
             function initializeSuccess(log) {
                 if(log.length === 0) {
                     vscode.window.showInformationMessage('Nothing to show');
@@ -72,24 +72,9 @@ function setHotfix(outChannel, configSettings, val) {
                 outChannel.append(log);
                 outChannel.show();
             }
-            function initializeFailed(error) {
-                if(error.code && error.syscall && error.code === 'ENOENT' && error.syscall === 'spawn git')
-                    vscode.window.showErrorMessage('Cannot find git installation');
-                else {
-                    outChannel.appendLine(error);
-                    outChannel.show();
-                    vscode.window.showErrorMessage('There was an error, please view details in output log');
-                }
-            }
-        }).catch(function (error) {
-            if(error.code && error.syscall && error.code === 'ENOENT' && error.syscall === 'spawn git')
-                vscode.window.showErrorMessage('Cannot find git installation');
-            else {
-                outChannel.appendLine(error);
-                outChannel.show();
-                vscode.window.showErrorMessage('There was an error, please view details in output log');
-            }
-    }).catch(function (error) {
+        }).catch(genericErrorHandler).catch(genericErrorHandler);
+
+    function genericErrorHandler(error) {
         if(error.code && error.syscall && error.code === 'ENOENT' && error.syscall === 'spawn git')
             vscode.window.showErrorMessage('Cannot find git installation');
         else {
@@ -97,12 +82,12 @@ function setHotfix(outChannel, configSettings, val) {
             outChannel.show();
             vscode.window.showErrorMessage('There was an error, please view details in output log');
         }
-    });
+    }
 }
 
 function initializeWithDefaults(outChannel) {
     gitUtils.getGitRepositoryPath(vscode.workspace.rootPath).then(function(getGitRepositoryPath) {
-        gitflowUtils.initializeRepository(getGitRepositoryPath).then(initializeSuccess, initializeFailed);
+        gitflowUtils.initializeRepository(getGitRepositoryPath).then(initializeSuccess, genericErrorHandler);
             function initializeSuccess(log) {
                 if(log.length === 0) {
                     vscode.window.showInformationMessage('Nothing to show');
@@ -112,24 +97,9 @@ function initializeWithDefaults(outChannel) {
                 outChannel.append(log);
                 outChannel.show();
             }
-            function initializeFailed(error) {
-                if(error.code && error.syscall && error.code === 'ENOENT' && error.syscall === 'spawn git')
-                    vscode.window.showErrorMessage('Cannot find git installation');
-                else {
-                    outChannel.appendLine(error);
-                    outChannel.show();
-                    vscode.window.showErrorMessage('There was an error, please view details in output log');
-                }
-            }
-        }).catch(function (error) {
-            if(error.code && error.syscall && error.code === 'ENOENT' && error.syscall === 'spawn git')
-                vscode.window.showErrorMessage('Cannot find git installation');
-            else {
-                outChannel.appendLine(error);
-                outChannel.show();
-                vscode.window.showErrorMessage('There was an error, please view details in output log');
-            }
-    }).catch(function (error) {
+        }).catch(genericErrorHandler).catch(genericErrorHandler);
+
+    function genericErrorHandler(error) {
         if(error.code && error.syscall && error.code === 'ENOENT' && error.syscall === 'spawn git')
             vscode.window.showErrorMessage('Cannot find git installation');
         else {
@@ -137,5 +107,5 @@ function initializeWithDefaults(outChannel) {
             outChannel.show();
             vscode.window.showErrorMessage('There was an error, please view details in output log');
         }
-    });
+    }
 }
