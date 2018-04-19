@@ -3,11 +3,11 @@ import { workspace } from 'vscode';
 import * as gitflowUtils from '../helpers/gitflowUtils';
 import * as gitUtils from '../helpers/gitUtils';
 import * as path from 'path';
-import { ConfigSettings } from '../settings/configSettings';
+import { InitConfigSettings } from '../settings/configSettings';
 import { BranchSetting } from '../settings/branchSettings';
 
 const config = workspace.getConfiguration();
-const configValues = config.get('gitflow4code.init') as ConfigSettings;
+const configValues = config.get('gitflow4code.init') as InitConfigSettings;
 
 export function run(outChannel) {
     var itemPickList = [

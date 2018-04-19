@@ -3,16 +3,17 @@ import { workspace } from 'vscode';
 import * as gitflowUtils from '../helpers/gitflowUtils';
 import * as gitUtils from '../helpers/gitUtils';
 import * as path from 'path';
-import { ConfigSettings } from '../settings/configSettings';
+import { InitConfigSettings } from '../settings/configSettings';
 import { BranchSetting } from '../settings/branchSettings';
 
 const config = workspace.getConfiguration(); 
-const configValues = config.get('gitflow4code.init') as ConfigSettings;
+const initValues = config.get('gitflow4code.init') as InitConfigSettings;
+const askForDeletion = config.get('gitflow4code.askBeforeDeletion') as Boolean;
 
 export function run(outChannel) {
     var itemPickList = [
             { 
-                label: 'Start Feature from ' + configValues.develop,
+                label: 'Start Feature from ' + initValues.develop,
                 description: ''
             },
             { 
@@ -29,11 +30,15 @@ export function run(outChannel) {
         
         outChannel.clear();
         if(item.label === itemPickList[0].label) 
-            vscode.window.showInputBox({ prompt: 'Name of Feature: ' }).then(val => startFeature(outChannel, val, configValues.develop));
+            vscode.window.showInputBox({ prompt: 'Name of Feature: ' }).then(val => startFeature(outChannel, val, initValues.develop));
         else if(item.label === itemPickList[1].label)
             getBranchNames(outChannel, item.label);
-        else
-            finishFeature(outChannel);
+        else {
+            if(askForDeletion)
+                vscode.window.showInputBox({ prompt: 'Would you like this feature branch deleted after finishing? (y/n)' }).then(val => finishFeature(outChannel, val));
+            else
+                finishFeature(outChannel, false);
+        }
         
     });
 }
@@ -51,8 +56,8 @@ function getBranchNames(outChannel, branchName) {
         
             var branchPickList = [];
             filteredBranchList.forEach(branchName => {
-                if(branchName === configValues.develop)
-                    branchPickList.push( { label: configValues.develop, description: 'create feature branch using ' + configValues.develop + ' as your base'});
+                if(branchName === initValues.develop)
+                    branchPickList.push( { label: initValues.develop, description: 'create feature branch using ' + initValues.develop + ' as your base'});
                 else
                 branchPickList.push( { label: branchName, description: 'create feature branch using ' + branchName + ' as your base'});
             });
@@ -95,7 +100,7 @@ function startFeature(outChannel, featureName, baseBranch) {
         }
 
         let featuresConfig = config.get('gitflow4code.features') as BranchSetting[];
-        featuresConfig.push(new BranchSetting(configValues.features + featureName, baseBranch));
+        featuresConfig.push(new BranchSetting(initValues.features + featureName, baseBranch));
         config.update('gitflow4code.features', featuresConfig);
         
         outChannel.append(log);
@@ -112,25 +117,27 @@ function startFeature(outChannel, featureName, baseBranch) {
     } 
 }
 
-function finishFeature(outChannel) {
+function finishFeature(outChannel, deleteBranch) {
     gitUtils.getGitRepositoryPath(vscode.workspace.rootPath).then(function (gitRepositoryPath) {
         gitUtils.getCurrentBranchName(vscode.workspace.rootPath).then((branchName) => {
-            if(branchName.toString().startsWith(configValues.features)) {
+            if(branchName.toString().startsWith(initValues.features)) {
                 let featuresConfig = config.get('gitflow4code.features') as BranchSetting[];
                 let featureSetting = featuresConfig.find((feature) => feature.name === branchName.toString());
                 if(!featureSetting) 
-                    featureSetting = new BranchSetting(branchName.toString(), configValues.develop);
+                    featureSetting = new BranchSetting(branchName.toString(), initValues.develop);
 
-                gitflowUtils.finishFeature(gitRepositoryPath, branchName.toString(), featureSetting.base).then(finishFeature, genericErrorHandler);
+                gitflowUtils.finishFeature(gitRepositoryPath, branchName.toString(), featureSetting.base, deleteBranch).then(finishFeature, genericErrorHandler);
                 function finishFeature(log) {
                     if(log.length === 0) {
                         vscode.window.showInformationMessage('Nothing to show');
                         return;
                     }
 
-                    let featureIndex = featuresConfig.indexOf(featureSetting);
-                    featuresConfig.splice(featureIndex, 1);
-                    config.update('gitflow4code.features', featuresConfig);
+                    if(deleteBranch) {
+                        let featureIndex = featuresConfig.indexOf(featureSetting);
+                        featuresConfig.splice(featureIndex, 1);
+                        config.update('gitflow4code.features', featuresConfig);
+                    }
                     
                     outChannel.append(log);
                     outChannel.show();

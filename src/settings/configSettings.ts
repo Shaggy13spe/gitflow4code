@@ -1,6 +1,6 @@
 'use strict';
 
-export class ConfigSettings {
+export class InitConfigSettings {
 
     constructor(master: string, develop: string, features: string, releases: string, hotfixes: string) {
         this.master = master;
