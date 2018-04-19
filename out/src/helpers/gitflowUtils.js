@@ -136,7 +136,7 @@ function startFeature(rootDir, featureName, baseBranch) {
     });
 }
 exports.startFeature = startFeature;
-function finishFeature(rootDir, featureName, baseBranch) {
+function finishFeature(rootDir, featureName, baseBranch, deleteBranch) {
     return gitUtils.getGitPath().then(function (gitExecutable) {
         return new Promise(function (resolve, reject) {
             let options = { cwd: rootDir };
@@ -163,14 +163,26 @@ function finishFeature(rootDir, featureName, baseBranch) {
                     error += data;
                 });
                 ls2.on('exit', function (code) {
-                    let ls3 = spawn(gitExecutable, ['branch', '-d', featureName], options);
-                    ls3.stdout.on('data', function (data) {
-                        log += data + '\n';
-                    });
-                    ls3.stderr.on('data', function (data) {
-                        error += data;
-                    });
-                    ls3.on('exit', function (code) {
+                    if (deleteBranch) {
+                        let ls3 = spawn(gitExecutable, ['branch', '-d', featureName], options);
+                        ls3.stdout.on('data', function (data) {
+                            log += data + '\n';
+                        });
+                        ls3.stderr.on('data', function (data) {
+                            error += data;
+                        });
+                        ls3.on('exit', function (code) {
+                            if (code > 0) {
+                                reject(error);
+                                return;
+                            }
+                            var message = log;
+                            if (code === 0 && error.length > 0)
+                                message += '\n\n' + error;
+                            resolve(message);
+                        });
+                    }
+                    else {
                         if (code > 0) {
                             reject(error);
                             return;
@@ -179,7 +191,7 @@ function finishFeature(rootDir, featureName, baseBranch) {
                         if (code === 0 && error.length > 0)
                             message += '\n\n' + error;
                         resolve(message);
-                    });
+                    }
                 });
             });
         });

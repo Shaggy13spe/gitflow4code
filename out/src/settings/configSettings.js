@@ -1,6 +1,6 @@
 'use strict';
 Object.defineProperty(exports, "__esModule", { value: true });
-class ConfigSettings {
+class InitConfigSettings {
     constructor(master, develop, features, releases, hotfixes) {
         this.develop = '';
         this.master = '';
@@ -15,5 +15,5 @@ class ConfigSettings {
         this.hotfixes = hotfixes;
     }
 }
-exports.ConfigSettings = ConfigSettings;
+exports.InitConfigSettings = InitConfigSettings;
 //# sourceMappingURL=configSettings.js.map

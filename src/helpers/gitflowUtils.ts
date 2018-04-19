@@ -205,6 +205,17 @@ export function finishFeature(rootDir, featureName, baseBranch, deleteBranch) {
                             resolve(message);
                         });
                     }
+                    else {
+                        if(code > 0) {
+                            reject(error);
+                            return;
+                        }
+                        var message = log;
+                        if(code === 0 && error.length > 0)
+                            message += '\n\n' + error;
+                            
+                        resolve(message);
+                    }
                 });
             });
         });

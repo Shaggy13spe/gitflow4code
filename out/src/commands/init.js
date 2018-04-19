@@ -6,7 +6,7 @@ const gitflowUtils = require("../helpers/gitflowUtils");
 const gitUtils = require("../helpers/gitUtils");
 const configSettings_1 = require("../settings/configSettings");
 function run(outChannel) {
-    let configSettings = new configSettings_1.ConfigSettings('master', 'develop', 'feature/', 'release/', 'hotfix/');
+    let configSettings = new configSettings_1.InitConfigSettings('master', 'develop', 'feature/', 'release/', 'hotfix/');
     var itemPickList = [
         {
             label: "Initialize with defaults",

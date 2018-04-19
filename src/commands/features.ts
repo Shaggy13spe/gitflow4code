@@ -35,12 +35,19 @@ export function run(outChannel) {
             getBranchNames(outChannel, item.label);
         else {
             if(askForDeletion)
-                vscode.window.showInputBox({ prompt: 'Would you like this feature branch deleted after finishing? (y/n)' }).then(val => finishFeature(outChannel, val));
+                vscode.window.showInputBox({ prompt: 'Would you like this feature branch deleted after finishing? (y/n)' }).then(val => processFinishRequest(outChannel, val));
             else
                 finishFeature(outChannel, false);
         }
         
     });
+}
+
+function processFinishRequest(outChannel, val) {
+    if(val !== undefined && (val.toLowerCase() === 'y' ||  val.toLowerCase() === 'n')) { 
+        var deleteBranch = val.toLowerCase() === 'y';
+        finishFeature(outChannel, deleteBranch); 
+    }
 }
 
 function getBranchNames(outChannel, branchName) {
