@@ -58,6 +58,11 @@
             "type": "object",
             "title": "greatminds.gitflow4code",
             "properties": {
+                "gitflow4code.askBeforeDeletion": {
+                    "type": "boolean",
+                    "description": "Controls whether user is asked to confirm deletion of feature, release, and/or hotfix branches after finishing them",
+                    "default": true
+                },
                 "gitflow4code.init": {
                     "type": "object",
                     "description": "Initialization values for git flow branches",
