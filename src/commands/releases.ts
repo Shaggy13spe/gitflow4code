@@ -3,16 +3,17 @@ import { workspace } from 'vscode';
 import * as gitflowUtils from '../helpers/gitflowUtils';
 import * as gitUtils from '../helpers/gitUtils';
 import * as path from 'path';
-import { ConfigSettings } from '../settings/configSettings';
+import { InitConfigSettings } from '../settings/configSettings';
 import { BranchSetting } from '../settings/branchSettings';
 
 const config = workspace.getConfiguration();
-const configValues = config.get('gitflow4code.init') as ConfigSettings;
+const initValues = config.get('gitflow4code.init') as InitConfigSettings;
+const askForDeletion = config.get('gitflow4code.askBeforeDeletion') as Boolean;
 
 export function run(outChannel) {
     var itemPickList = [
             { 
-                label: 'Start Release from ' + configValues.develop,
+                label: 'Start Release from ' + initValues.develop,
                 description: ''
             },
             { 
@@ -29,12 +30,22 @@ export function run(outChannel) {
         
         outChannel.clear();
         if(item.label === itemPickList[0].label)
-            vscode.window.showInputBox({ prompt: 'Name of Release: ' }).then(val => startRelease(outChannel, val, configValues.develop));
+            vscode.window.showInputBox({ prompt: 'Name of Release: ' }).then(val => startRelease(outChannel, val, initValues.develop));
         else if(item.label === itemPickList[1].label)
             getBranchNames(outChannel, item.label);
-        else 
-            vscode.window.showInputBox({ prompt: 'Tag this release with: ' }).then(val => finishRelease(outChannel, val));
-    
+        else {
+            if(askForDeletion)
+                vscode.window.showInputBox({ prompt: 'Tag this release with: ' }).then(function(tag) {
+                    vscode.window.showInputBox({ prompt: 'Would you like this release branch deleted after finishing? (y/n)' }).then(function(val) {
+                        if(val !== undefined && (val.toLowerCase() === 'y' ||  val.toLowerCase() === 'n')) { 
+                            var deleteBranch = val.toLowerCase() === 'y';
+                            finishRelease(outChannel, tag, deleteBranch); 
+                        }
+                    });
+                });
+            else
+                vscode.window.showInputBox({ prompt: 'Tag this release with: ' }).then(tag => finishRelease(outChannel, tag, false));
+        }
     });
 }
 
@@ -51,8 +62,8 @@ function getBranchNames(outChannel, branchName) {
         
             var branchPickList = [];
             filteredBranchList.forEach(branchName => {
-                if(branchName === configValues.develop)
-                    branchPickList.push( { label: configValues.develop, description: 'create release branch using ' + configValues.develop + ' as your base'});
+                if(branchName === initValues.develop)
+                    branchPickList.push( { label: initValues.develop, description: 'create release branch using ' + initValues.develop + ' as your base'});
                 else
                     branchPickList.push( { label: branchName, description: 'create release branch using ' + branchName + ' as your base'});
             });
@@ -95,7 +106,7 @@ function startRelease(outChannel, releaseName, baseBranch) {
         }
 
         let releasesConfig = config.get('gitflow4code.releases') as BranchSetting[];
-        releasesConfig.push(new BranchSetting(configValues.releases + releaseName, baseBranch));
+        releasesConfig.push(new BranchSetting(initValues.releases + releaseName, baseBranch));
         config.update('gitflow4code.releases', releasesConfig);
         
         outChannel.append(log);
@@ -112,19 +123,25 @@ function startRelease(outChannel, releaseName, baseBranch) {
     } 
 }
 
-function finishRelease(outChannel, releaseTag) {
+function finishRelease(outChannel, releaseTag, deleteBranch) {
     gitUtils.getGitRepositoryPath(vscode.workspace.rootPath).then(function (gitRepositoryPath) {
         gitUtils.getCurrentBranchName(vscode.workspace.rootPath).then((branchName) => {
             let releasesConfig = config.get('gitflow4code.releases') as BranchSetting[];
             let releaseSetting = releasesConfig.find((release) => release.name === branchName.toString());
             if(!releaseSetting)
-                releaseSetting = new BranchSetting(branchName.toString(), configValues.develop);
+                releaseSetting = new BranchSetting(branchName.toString(), initValues.develop);
             
-            gitflowUtils.finishRelease(gitRepositoryPath, releaseSetting.base, releaseTag).then(finishRelease, genericErrorHandler);
+            gitflowUtils.finishRelease(gitRepositoryPath, releaseSetting.base, releaseTag, deleteBranch).then(finishRelease, genericErrorHandler);
             function finishRelease(log) {
                 if(log.length === 0) {
                     vscode.window.showInformationMessage('Nothing to show');
                     return;
+                }
+
+                if(deleteBranch) {
+                    let releaseIndex = releasesConfig.indexOf(releaseSetting);
+                    releasesConfig.splice(releaseIndex, 1);
+                    config.update('gitflow4code.releases', releasesConfig);
                 }
                 
                 outChannel.append(log);

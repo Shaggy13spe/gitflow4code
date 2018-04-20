@@ -5,7 +5,7 @@ import * as path from 'path';
 import * as child_process_1 from 'child_process';
 import * as fs from 'fs';
 import * as gitUtils from '../helpers/gitUtils';
-import { ConfigSettings } from '../settings/configSettings';
+import { InitConfigSettings } from '../settings/configSettings';
 import { BranchSetting } from '../settings/branchSettings';
 
 /*
@@ -50,7 +50,7 @@ export function initializeRepository(rootDir) {
     return gitUtils.getGitPath().then(function(gitExecutable) {
 
         const config = workspace.getConfiguration(); 
-        const configValues = config.get('gitflow4code.init') as ConfigSettings;
+        const configValues = config.get('gitflow4code.init') as InitConfigSettings;
         return new Promise(function(resolve, reject) {
             let log = '';
             let error = '';
@@ -110,7 +110,7 @@ export function startFeature(rootDir, featureName, baseBranch) {
     return gitUtils.getGitPath().then(function (gitExecutable) {
         return new Promise(function (resolve, reject) {
             const config = workspace.getConfiguration(); 
-            const configValues = config.get('gitflow4code.init') as ConfigSettings;
+            const configValues = config.get('gitflow4code.init') as InitConfigSettings;
             const featurePrefix = configValues.features;
 
             featureName = featureName.replace(/ /g, '_');
@@ -157,7 +157,7 @@ export function startFeature(rootDir, featureName, baseBranch) {
     });
 }
 
-export function finishFeature(rootDir, featureName, baseBranch) {
+export function finishFeature(rootDir, featureName, baseBranch, deleteBranch) {
     return gitUtils.getGitPath().then(function (gitExecutable) {
         return new Promise(function(resolve, reject) {
             let options = { cwd: rootDir };
@@ -185,14 +185,27 @@ export function finishFeature(rootDir, featureName, baseBranch) {
                     error += data;
                 });
                 ls2.on('exit', function (code) {
-                    let ls3 = spawn(gitExecutable, ['branch', '-d', featureName], options);
-                    ls3.stdout.on('data', function (data) {
-                        log += data + '\n';
-                    });
-                    ls3.stderr.on('data', function (data) {
-                        error += data;
-                    });
-                    ls3.on('exit', function (code) {
+                    if(deleteBranch) {
+                        let ls3 = spawn(gitExecutable, ['branch', '-d', featureName], options);
+                        ls3.stdout.on('data', function (data) {
+                            log += data + '\n';
+                        });
+                        ls3.stderr.on('data', function (data) {
+                            error += data;
+                        });
+                        ls3.on('exit', function (code) {
+                            if(code > 0) {
+                                reject(error);
+                                return;
+                            }
+                            var message = log;
+                            if(code === 0 && error.length > 0)
+                                message += '\n\n' + error;
+                                
+                            resolve(message);
+                        });
+                    }
+                    else {
                         if(code > 0) {
                             reject(error);
                             return;
@@ -202,7 +215,7 @@ export function finishFeature(rootDir, featureName, baseBranch) {
                             message += '\n\n' + error;
                             
                         resolve(message);
-                    });
+                    }
                 });
             });
         });
@@ -213,7 +226,7 @@ export function startRelease(rootDir, releaseName, baseBranch) {
     return gitUtils.getGitPath().then(function (gitExecutable) {
         return new Promise(function (resolve, reject) {
             const config = workspace.getConfiguration(); 
-            const configValues = config.get('gitflow4code.init') as ConfigSettings;
+            const configValues = config.get('gitflow4code.init') as InitConfigSettings;
             const releasePrefix = configValues.releases;
 
             releaseName = releaseName.replace(/ /g, '_');
@@ -258,7 +271,7 @@ export function startRelease(rootDir, releaseName, baseBranch) {
     });
 }
 
-export function finishRelease(rootDir, baseBranch, releaseTag) {
+export function finishRelease(rootDir, baseBranch, releaseTag, deleteBranch) {
     return gitUtils.getGitPath().then(function (gitExecutable) {
         return new Promise(function(resolve, reject) {
             let options = { cwd: rootDir };
@@ -283,7 +296,7 @@ export function finishRelease(rootDir, baseBranch, releaseTag) {
 
                 currentBranch = branchData.replace(/ /g,'').trim().split('\n')[0];
                 const config = workspace.getConfiguration(); 
-                const configValues = config.get('gitflow4code.init') as ConfigSettings;
+                const configValues = config.get('gitflow4code.init') as InitConfigSettings;
                 const releasePrefix = configValues.releases;
                 inRelease = currentBranch.startsWith(releasePrefix);
                 
@@ -351,14 +364,27 @@ export function finishRelease(rootDir, baseBranch, releaseTag) {
                                     error += data;
                                 });
                                 ls6.on('exit', function (code) {
-                                    let ls6 = spawn(gitExecutable, ['branch', '-d', currentBranch], options);
-                                    ls6.stdout.on('data', function (data) {
-                                        log += data + '\n';
-                                    });
-                                    ls6.stderr.on('data', function (data) {
-                                        error += data;
-                                    });
-                                    ls6.on('exit', function (code) {
+                                    if(deleteBranch) {
+                                        let ls6 = spawn(gitExecutable, ['branch', '-d', currentBranch], options);
+                                        ls6.stdout.on('data', function (data) {
+                                            log += data + '\n';
+                                        });
+                                        ls6.stderr.on('data', function (data) {
+                                            error += data;
+                                        });
+                                        ls6.on('exit', function (code) {
+                                            if(code > 0) {
+                                                reject(error);
+                                                return;
+                                            }
+                                            var message = log;
+                                            if(code === 0 && error.length > 0)
+                                                message += '\n\n' + error;
+                                                
+                                            resolve(message);
+                                        });
+                                    }
+                                    else {
                                         if(code > 0) {
                                             reject(error);
                                             return;
@@ -368,7 +394,7 @@ export function finishRelease(rootDir, baseBranch, releaseTag) {
                                             message += '\n\n' + error;
                                             
                                         resolve(message);
-                                    });
+                                    }
                                 });
                             });
                         });
@@ -383,7 +409,7 @@ export function startHotfix(rootDir, hotfixName, baseBranch) {
     return gitUtils.getGitPath().then(function (gitExecutable) {
         return new Promise(function (resolve, reject) {
             const config = workspace.getConfiguration(); 
-            const configValues = config.get('gitflow4code.init') as ConfigSettings;
+            const configValues = config.get('gitflow4code.init') as InitConfigSettings;
             const hotfixPrefix = configValues.hotfixes;
 
             hotfixName = hotfixName.replace(/ /g, '_');
@@ -428,7 +454,7 @@ export function startHotfix(rootDir, hotfixName, baseBranch) {
     });
 }
 
-export function finishHotfix(rootDir, baseBranch, hotfixTag) {
+export function finishHotfix(rootDir, baseBranch, hotfixTag, deleteBranch) {
     return gitUtils.getGitPath().then(function (gitExecutable) {
         return new Promise(function(resolve, reject) {
             let options = { cwd: rootDir };
@@ -453,7 +479,7 @@ export function finishHotfix(rootDir, baseBranch, hotfixTag) {
 
                 currentBranch = branchData.replace(/ /g,'').trim().split('\n')[0];
                 const config = workspace.getConfiguration(); 
-                const configValues = config.get('gitflow4code.init') as ConfigSettings;
+                const configValues = config.get('gitflow4code.init') as InitConfigSettings;
                 const hotfixPrefix = configValues.hotfixes;
                 inHotfix = currentBranch.startsWith(hotfixPrefix);
                 
@@ -521,14 +547,27 @@ export function finishHotfix(rootDir, baseBranch, hotfixTag) {
                                     error += data;
                                 });
                                 ls6.on('exit', function (code) {
-                                    let ls6 = spawn(gitExecutable, ['branch', '-d', currentBranch], options);
-                                    ls6.stdout.on('data', function (data) {
-                                        log += data + '\n';
-                                    });
-                                    ls6.stderr.on('data', function (data) {
-                                        error += data;
-                                    });
-                                    ls6.on('exit', function (code) {
+                                    if(deleteBranch) {
+                                        let ls6 = spawn(gitExecutable, ['branch', '-d', currentBranch], options);
+                                        ls6.stdout.on('data', function (data) {
+                                            log += data + '\n';
+                                        });
+                                        ls6.stderr.on('data', function (data) {
+                                            error += data;
+                                        });
+                                        ls6.on('exit', function (code) {
+                                            if(code > 0) {
+                                                reject(error);
+                                                return;
+                                            }
+                                            var message = log;
+                                            if(code === 0 && error.length > 0)
+                                                message += '\n\n' + error;
+                                                
+                                            resolve(message);
+                                        });
+                                    }
+                                    else {
                                         if(code > 0) {
                                             reject(error);
                                             return;
@@ -538,7 +577,7 @@ export function finishHotfix(rootDir, baseBranch, hotfixTag) {
                                             message += '\n\n' + error;
                                             
                                         resolve(message);
-                                    });
+                                    }
                                 });
                             });
                         });

@@ -3,10 +3,10 @@ import { workspace } from 'vscode';
 import * as gitflowUtils from '../helpers/gitflowUtils';
 import * as gitUtils from '../helpers/gitUtils';
 import * as path from 'path';
-import { ConfigSettings } from '../settings/configSettings';
+import { InitConfigSettings } from '../settings/configSettings';
 
 export function run(outChannel) {
-    let configSettings = new ConfigSettings('master', 'develop', 'feature/', 'release/', 'hotfix/');
+    let configSettings = new InitConfigSettings('master', 'develop', 'feature/', 'release/', 'hotfix/');
     var itemPickList = [
         {
             label: "Initialize with defaults",
@@ -59,7 +59,7 @@ function setHotfix(outChannel, configSettings, val) {
         configSettings.hotfixes = val;
 
     const config = workspace.getConfiguration(); 
-    const configValues = config.get('gitflow4code.init') as ConfigSettings;
+    const configValues = config.get('gitflow4code.init') as InitConfigSettings;
     config.update('gitflow4code.init', configSettings, vscode.ConfigurationTarget.Workspace);
     gitUtils.getGitRepositoryPath(vscode.workspace.rootPath).then(function(getGitRepositoryPath) {
         gitflowUtils.initializeRepository(getGitRepositoryPath).then(initializeSuccess, genericErrorHandler);

@@ -8,7 +8,7 @@ import * as featureCommands from './commands/features';
 import * as releaseCommands from './commands/releases';
 import * as hotfixCommands from './commands/hotfixes';
 import * as gitCommands from './commands/gitCommands';
-import { ConfigSettings } from './settings/configSettings';
+import { InitConfigSettings } from './settings/configSettings';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
