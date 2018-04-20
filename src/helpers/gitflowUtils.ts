@@ -271,7 +271,7 @@ export function startRelease(rootDir, releaseName, baseBranch) {
     });
 }
 
-export function finishRelease(rootDir, baseBranch, releaseTag) {
+export function finishRelease(rootDir, baseBranch, releaseTag, deleteBranch) {
     return gitUtils.getGitPath().then(function (gitExecutable) {
         return new Promise(function(resolve, reject) {
             let options = { cwd: rootDir };
@@ -364,14 +364,27 @@ export function finishRelease(rootDir, baseBranch, releaseTag) {
                                     error += data;
                                 });
                                 ls6.on('exit', function (code) {
-                                    let ls6 = spawn(gitExecutable, ['branch', '-d', currentBranch], options);
-                                    ls6.stdout.on('data', function (data) {
-                                        log += data + '\n';
-                                    });
-                                    ls6.stderr.on('data', function (data) {
-                                        error += data;
-                                    });
-                                    ls6.on('exit', function (code) {
+                                    if(deleteBranch) {
+                                        let ls6 = spawn(gitExecutable, ['branch', '-d', currentBranch], options);
+                                        ls6.stdout.on('data', function (data) {
+                                            log += data + '\n';
+                                        });
+                                        ls6.stderr.on('data', function (data) {
+                                            error += data;
+                                        });
+                                        ls6.on('exit', function (code) {
+                                            if(code > 0) {
+                                                reject(error);
+                                                return;
+                                            }
+                                            var message = log;
+                                            if(code === 0 && error.length > 0)
+                                                message += '\n\n' + error;
+                                                
+                                            resolve(message);
+                                        });
+                                    }
+                                    else {
                                         if(code > 0) {
                                             reject(error);
                                             return;
@@ -381,7 +394,7 @@ export function finishRelease(rootDir, baseBranch, releaseTag) {
                                             message += '\n\n' + error;
                                             
                                         resolve(message);
-                                    });
+                                    }
                                 });
                             });
                         });
@@ -441,7 +454,7 @@ export function startHotfix(rootDir, hotfixName, baseBranch) {
     });
 }
 
-export function finishHotfix(rootDir, baseBranch, hotfixTag) {
+export function finishHotfix(rootDir, baseBranch, hotfixTag, deleteBranch) {
     return gitUtils.getGitPath().then(function (gitExecutable) {
         return new Promise(function(resolve, reject) {
             let options = { cwd: rootDir };
@@ -534,14 +547,27 @@ export function finishHotfix(rootDir, baseBranch, hotfixTag) {
                                     error += data;
                                 });
                                 ls6.on('exit', function (code) {
-                                    let ls6 = spawn(gitExecutable, ['branch', '-d', currentBranch], options);
-                                    ls6.stdout.on('data', function (data) {
-                                        log += data + '\n';
-                                    });
-                                    ls6.stderr.on('data', function (data) {
-                                        error += data;
-                                    });
-                                    ls6.on('exit', function (code) {
+                                    if(deleteBranch) {
+                                        let ls6 = spawn(gitExecutable, ['branch', '-d', currentBranch], options);
+                                        ls6.stdout.on('data', function (data) {
+                                            log += data + '\n';
+                                        });
+                                        ls6.stderr.on('data', function (data) {
+                                            error += data;
+                                        });
+                                        ls6.on('exit', function (code) {
+                                            if(code > 0) {
+                                                reject(error);
+                                                return;
+                                            }
+                                            var message = log;
+                                            if(code === 0 && error.length > 0)
+                                                message += '\n\n' + error;
+                                                
+                                            resolve(message);
+                                        });
+                                    }
+                                    else {
                                         if(code > 0) {
                                             reject(error);
                                             return;
@@ -551,7 +577,7 @@ export function finishHotfix(rootDir, baseBranch, hotfixTag) {
                                             message += '\n\n' + error;
                                             
                                         resolve(message);
-                                    });
+                                    }
                                 });
                             });
                         });
