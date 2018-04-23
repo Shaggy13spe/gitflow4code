@@ -2,7 +2,7 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
-import { workspace } from 'vscode';
+import { workspace, window, commands } from 'vscode';
 import * as initCommands from './commands/init';
 import * as featureCommands from './commands/features';
 import * as releaseCommands from './commands/releases';
@@ -17,13 +17,21 @@ export function activate(context: vscode.ExtensionContext) {
     // let featureFinisher = new FeatureStatusItem();
     // featureFinisher.showFeatureStatus();
 
+    // create file watcher to see if ./.git/HEAD has changed. If so, this an indication 
+    // that the branch has changed
+    const watcher = workspace.createFileSystemWatcher('**/.git/HEAD'); 
+
+    watcher.onDidChange(() => {
+        window.showInformationMessage("branch changed"); 
+    });
+
     var outChannel;
-    outChannel = vscode.window.createOutputChannel('Git');
+    outChannel = window.createOutputChannel('Git');
 
     // The command has been defined in the package.json file
     // Now provide the implementation of the command with registerCommand
     // The commandId parameter must match the command field in package.json
-    let disposable = vscode.commands.registerCommand('gitflow.GitFlow', () => {
+    let disposable = commands.registerCommand('gitflow.GitFlow', () => {
         
         // The code you place here will be executed every time your command is executed
         var itemPickList = [
@@ -48,7 +56,7 @@ export function activate(context: vscode.ExtensionContext) {
                 description: "Runs git status on command line"
             }
         ];
-        vscode.window.showQuickPick(itemPickList).then(function(item) {
+        window.showQuickPick(itemPickList).then(function(item) {
             if(!item) return;
             
             outChannel.clear();
