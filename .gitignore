@@ -22,7 +22,9 @@ build/Release
 #Dirs
 out
 node_modules
-.vscode
+
+#VSCode Settings files
+.vscode/settings.json
 
 # Compiled source #
 ###################
