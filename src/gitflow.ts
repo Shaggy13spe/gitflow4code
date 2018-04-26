@@ -2,92 +2,108 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
-import { workspace } from 'vscode';
+import { workspace, window, commands, extensions, Disposable } from 'vscode';
 import * as initCommands from './commands/init';
 import * as featureCommands from './commands/features';
 import * as releaseCommands from './commands/releases';
 import * as hotfixCommands from './commands/hotfixes';
 import * as gitCommands from './commands/gitCommands';
-import { ConfigSettings } from './settings/configSettings';
+import { InitConfigSettings } from './settings/configSettings';
+import { getCurrentBranchName } from '../src/helpers/gitUtils';
+import { toDisposable } from './util';
 
-// this method is called when your extension is activated
-// your extension is activated the very first time the command is executed
-export function activate(context: vscode.ExtensionContext) {
+const config = workspace.getConfiguration(); 
+const api = extensions.getExtension('vscode.git').exports;
+const initValues = config.get('gitflow4code.init') as InitConfigSettings;
 
-    // let featureFinisher = new FeatureStatusItem();
-    // featureFinisher.showFeatureStatus();
+async function init(context: vscode.ExtensionContext, disposables: Disposable[]): Promise<void> {
+    const outChannel = window.createOutputChannel('Git');
+    disposables.push(outChannel);
 
-    var outChannel;
-    outChannel = vscode.window.createOutputChannel('Git');
+    let statusFinisher = new FinishStatusItem();
 
-    // The command has been defined in the package.json file
-    // Now provide the implementation of the command with registerCommand
-    // The commandId parameter must match the command field in package.json
-    let disposable = vscode.commands.registerCommand('gitflow.GitFlow', () => {
-        
-        // The code you place here will be executed every time your command is executed
-        var itemPickList = [
-            {
-                label: "Initialize",
-                description: "Command to initialize the git repository for feature branch flow"
-            },
-            { 
-                label: "Features",
-                description: "Commands for managing git-flow features"
-            },
-            {
-                label: "Releases",
-                description: "Commands for managing git-flow releases"
-            },
-            {
-                label: "Hotfixes",
-                description: "Commands for managing git-flow hotfixes"
-            },
-            {
-                label: "Get Status",
-                description: "Runs git status on command line"
-            }
-        ];
-        vscode.window.showQuickPick(itemPickList).then(function(item) {
-            if(!item) return;
-            
-            outChannel.clear();
-            switch (item.label) {
-                case itemPickList[0].label:
-                    initCommands.run(outChannel);
-                    break;
-                case itemPickList[1].label:
-                    featureCommands.run(outChannel);
-                    break;
-                case itemPickList[2].label:
-                    releaseCommands.run(outChannel);
-                    break;
-                case itemPickList[3].label:
-                    hotfixCommands.run(outChannel);
-                    break;
-                default:
-                    gitCommands.run(outChannel);
-                    break;
-            }
-        });
-        
-    });
+    let initializeCommand = vscode.commands.registerCommand('gitflow.initialize', () => { initCommands.run(outChannel); });
+    let startFeatureCommand = vscode.commands.registerCommand('gitflow.startFeature', () => { featureCommands.run(outChannel, 'start'); });
+    let finishFeatureCommand = vscode.commands.registerCommand('gitflow.finishFeature', () => { featureCommands.run(outChannel, 'finish'); });
+    let startReleaseCommand = vscode.commands.registerCommand('gitflow.startRelease', () => { releaseCommands.run(outChannel, 'start'); });
+    let finishReleaseCommand = vscode.commands.registerCommand('gitflow.finishRelease', () => { releaseCommands.run(outChannel, 'finish'); });
+    let startHotfixCommand = vscode.commands.registerCommand('gitflow.startHotfix', () => { hotfixCommands.run(outChannel, 'start'); });
+    let releaseHotfixCommand = vscode.commands.registerCommand('gitflow.finishHotfix', () => { hotfixCommands.run(outChannel, 'finish'); });
+    let gitStatusCommand = vscode.commands.registerCommand('gitflow.gitStatus', () => { gitCommands.run(outChannel); });
 
-    // context.subscriptions.push(featureFinisher);
-    context.subscriptions.push(disposable);
+    context.subscriptions.push(statusFinisher);
+    context.subscriptions.push(initializeCommand);
+    context.subscriptions.push(startFeatureCommand);
+    context.subscriptions.push(finishFeatureCommand);
+    context.subscriptions.push(startReleaseCommand);
+    context.subscriptions.push(finishReleaseCommand);
+    context.subscriptions.push(startHotfixCommand);
+    context.subscriptions.push(releaseHotfixCommand);
+    context.subscriptions.push(gitStatusCommand);
     
 }
 
-class FeatureStatusItem {
+// this method is called when your extension is activated
+// your extension is activated the very first time the command is executed
+export function activate(context: vscode.ExtensionContext): any {
+    const disposables: Disposable[] = [];
+    context.subscriptions.push(new Disposable(() => Disposable.from(...disposables).dispose()));
+
+    init(context, disposables).catch(err => console.error(err));
+
+    let statusFinisher = new FinishStatusItem();
+    getCurrentBranchName(vscode.workspace.rootPath).then((branchName) => {
+        if(branchName.toString().startsWith(initValues.features)
+            || branchName.toString().startsWith(initValues.releases)
+            || branchName.toString().startsWith(initValues.hotfixes)) {
+
+            statusFinisher.showStatusItem(branchName);
+        }
+        else
+            statusFinisher.closeStatusItem();
+    });
+
+    // create file watcher to see if ./.git/HEAD has changed. If so, this an indication 
+    // that the branch has changed
+    const watcher = workspace.createFileSystemWatcher('**/.git/HEAD'); 
+
+    watcher.onDidChange(() => {
+        getCurrentBranchName(vscode.workspace.rootPath).then((branchName) => {
+            if(branchName.toString().startsWith(initValues.features)
+                || branchName.toString().startsWith(initValues.releases)
+                || branchName.toString().startsWith(initValues.hotfixes)) {
+
+                statusFinisher.showStatusItem(branchName);
+            }
+            else
+                statusFinisher.closeStatusItem();
+        });
+    });    
+}
+
+class FinishStatusItem {
     private _statusBarItem: vscode.StatusBarItem;
 
-    public showFeatureStatus() {
+    public showStatusItem(branchName) {
         if(!this._statusBarItem)
             this._statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
+             
+        this._statusBarItem.text = '$(git-merge) Finish ' + branchName;
 
-        this._statusBarItem.text = 'feature test';
-        this._statusBarItem.command = 'hello';
+        let command = '';
+        if(branchName.toString().startsWith(initValues.features))
+            command = 'gitflow.finishFeature';
+        else if(branchName.toString().startsWith(initValues.releases))
+            command = 'gitflow.finishRelease';
+        else if(branchName.toString().startsWith(initValues.hotfixes))
+            command = 'gitflow.finishHotfix';
+
+        this._statusBarItem.command = command;
         this._statusBarItem.show();
+    }
+
+    public closeStatusItem() {
+        this._statusBarItem.hide();
     }
 
     dispose() {

@@ -3,78 +3,67 @@ import { workspace } from 'vscode';
 import * as gitflowUtils from '../helpers/gitflowUtils';
 import * as gitUtils from '../helpers/gitUtils';
 import * as path from 'path';
-import { ConfigSettings } from '../settings/configSettings';
+import { InitConfigSettings } from '../settings/configSettings';
 import { BranchSetting } from '../settings/branchSettings';
 
 const config = workspace.getConfiguration();
-const configValues = config.get('gitflow4code.init') as ConfigSettings;
+const initValues = config.get('gitflow4code.init') as InitConfigSettings;
+const askForDeletion = config.get('gitflow4code.askBeforeDeletion') as Boolean;
+const deleteByDefault = config.get('gitflow4code.deleteBranchByDefault') as Boolean;
 
-export function run(outChannel) {
-    var itemPickList = [
+export function run(outChannel, action) {
+    if(action === 'start') {
+        var itemPickList = [
             { 
-                label: 'Start Release from ' + configValues.develop,
+                label: 'Start Release from ' + initValues.develop,
                 description: ''
             },
             { 
                 label: 'Start Release from another base branch',
                 description: ''
-            },
-            {
-                label: 'Finish Release',
-                description: ''
             }
         ];
-    vscode.window.showQuickPick(itemPickList).then(function(item) {
-        if(!item) return;
         
-        outChannel.clear();
-        if(item.label === itemPickList[0].label)
-            vscode.window.showInputBox({ prompt: 'Name of Release: ' }).then(val => startRelease(outChannel, val, configValues.develop));
-        else if(item.label === itemPickList[1].label)
-            getBranchNames(outChannel, item.label);
-        else 
-            vscode.window.showInputBox({ prompt: 'Tag this release with: ' }).then(val => finishRelease(outChannel, val));
-    
-    });
-}
-
-function getBranchNames(outChannel, branchName) {
-    var branchList = gitUtils.getGitRepositoryPath(vscode.workspace.rootPath).then(function (gitRepositoryPath) {
-        gitUtils.getBranchList(gitRepositoryPath).then((branches) => {
-
-            var branchList = branches as string[];
+        vscode.window.showQuickPick(itemPickList).then(function(item) {
+            if(!item) return;
             
-            var filteredBranchList = branchList.map((value) => {
-                // if(value.replace('*', '').trim() !== configValues.master && !value.replace('*', '').trim().startsWith(configValues.hotfixes))
-                return value.replace('*', '').trim();
-            }).filter(x => !!x);
-        
-            var branchPickList = [];
-            filteredBranchList.forEach(branchName => {
-                if(branchName === configValues.develop)
-                    branchPickList.push( { label: configValues.develop, description: 'create release branch using ' + configValues.develop + ' as your base'});
-                else
-                    branchPickList.push( { label: branchName, description: 'create release branch using ' + branchName + ' as your base'});
+            outChannel.clear();
+            if(item.label === itemPickList[0].label)
+                vscode.window.showInputBox({ prompt: 'Name of Release: ' }).then(val => startRelease(outChannel, val, initValues.develop));
+            else if(item.label === itemPickList[1].label)
+                gitUtils.getBranchList(workspace.rootPath).then((releases) => {
+                    var branchPickList = [];
+                    releases.forEach(branchName => {
+                        if(branchName === initValues.develop)
+                            branchPickList.push( { label: initValues.develop, description: 'create release branch using ' + initValues.develop + ' as your base'});
+                        else
+                            branchPickList.push( { label: branchName, description: 'create release branch using ' + branchName + ' as your base'});
+                    });
+                
+                    vscode.window.showQuickPick(branchPickList).then(function(item) {
+                        if(!item) return;
+                
+                        outChannel.clear();
+                        vscode.window.showInputBox({ prompt: 'Name of Release: ' }).then(val => startRelease(outChannel, val, item.label));
+                    });
+                });
+            else {
+            }
+        });
+    }
+    else if (action === 'finish') {
+        if(askForDeletion)
+            vscode.window.showInputBox({ prompt: 'Tag this release with: ' }).then(function(tag) {
+                vscode.window.showInputBox({ prompt: 'Would you like this release branch deleted after finishing? (y/n)' }).then(function(val) {
+                    if(val !== undefined && (val.toLowerCase() === 'y' ||  val.toLowerCase() === 'n')) { 
+                        var deleteBranch = val.toLowerCase() === 'y';
+                        finishRelease(outChannel, tag, deleteBranch); 
+                    }
+                });
             });
-        
-            vscode.window.showQuickPick(branchPickList).then(function(item) {
-                if(!item) return;
-        
-                outChannel.clear();
-                vscode.window.showInputBox({ prompt: 'Name of Release: ' }).then(val => startRelease(outChannel, val, item.label));
-            });
-        }, genericErrorHandler);
-    });
-
-    function genericErrorHandler(error) {
-        if(error.code && error.syscall && error.code === 'ENOENT' && error.syscall === 'spawn git')
-            vscode.window.showErrorMessage('Cannot find git installation');
-        else {
-            outChannel.appendLine(error);
-            outChannel.show();
-            vscode.window.showErrorMessage('There was an error, please view details in output log');
-        }
-    } 
+        else
+            vscode.window.showInputBox({ prompt: 'Tag this release with: ' }).then(tag => finishRelease(outChannel, tag, deleteByDefault));
+    }
 }
 
 function startRelease(outChannel, releaseName, baseBranch) {
@@ -95,7 +84,7 @@ function startRelease(outChannel, releaseName, baseBranch) {
         }
 
         let releasesConfig = config.get('gitflow4code.releases') as BranchSetting[];
-        releasesConfig.push(new BranchSetting(configValues.releases + releaseName, baseBranch));
+        releasesConfig.push(new BranchSetting(initValues.releases + releaseName, baseBranch));
         config.update('gitflow4code.releases', releasesConfig);
         
         outChannel.append(log);
@@ -112,19 +101,25 @@ function startRelease(outChannel, releaseName, baseBranch) {
     } 
 }
 
-function finishRelease(outChannel, releaseTag) {
+function finishRelease(outChannel, releaseTag, deleteBranch) {
     gitUtils.getGitRepositoryPath(vscode.workspace.rootPath).then(function (gitRepositoryPath) {
         gitUtils.getCurrentBranchName(vscode.workspace.rootPath).then((branchName) => {
             let releasesConfig = config.get('gitflow4code.releases') as BranchSetting[];
             let releaseSetting = releasesConfig.find((release) => release.name === branchName.toString());
             if(!releaseSetting)
-                releaseSetting = new BranchSetting(branchName.toString(), configValues.develop);
+                releaseSetting = new BranchSetting(branchName.toString(), initValues.develop);
             
-            gitflowUtils.finishRelease(gitRepositoryPath, releaseSetting.base, releaseTag).then(finishRelease, genericErrorHandler);
+            gitflowUtils.finishRelease(gitRepositoryPath, releaseSetting.base, releaseTag, deleteBranch).then(finishRelease, genericErrorHandler);
             function finishRelease(log) {
                 if(log.length === 0) {
                     vscode.window.showInformationMessage('Nothing to show');
                     return;
+                }
+
+                if(deleteBranch) {
+                    let releaseIndex = releasesConfig.indexOf(releaseSetting);
+                    releasesConfig.splice(releaseIndex, 1);
+                    config.update('gitflow4code.releases', releasesConfig);
                 }
                 
                 outChannel.append(log);
