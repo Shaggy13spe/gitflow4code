@@ -9,9 +9,11 @@ import { BranchSetting } from '../settings/branchSettings';
 const config = workspace.getConfiguration();
 const initValues = config.get('gitflow4code.init') as InitConfigSettings;
 const askForDeletion = config.get('gitflow4code.askBeforeDeletion') as Boolean;
+const deleteByDefault = config.get('gitflow4code.deleteBranchByDefault') as Boolean;
 
-export function run(outChannel) {
-    var itemPickList = [
+export function run(outChannel, action) {
+    if(action === 'start') {
+        var itemPickList = [
             { 
                 label: 'Start Hotfix from ' + initValues.master,
                 description: ''
@@ -19,73 +21,46 @@ export function run(outChannel) {
             { 
                 label: 'Start Hotfix from another base branch',
                 description: ''
-            },
-            {
-                label: 'Finish Hotfix',
-                description: ''
             }
         ];
-    vscode.window.showQuickPick(itemPickList).then(function(item) {
-        if(!item) return;
-        
-        outChannel.clear();
-        if(item.label === itemPickList[0].label)
-            vscode.window.showInputBox({ prompt: 'Name of Hotfix: ' }).then(val => startHotfix(outChannel, val, initValues.master));
-        else if(item.label === itemPickList[1].label)
-            getBranchNames(outChannel, item.label);
-        else {
-            if(askForDeletion)
-                vscode.window.showInputBox({ prompt: 'Tag this hotfix with: ' }).then(function(tag) {
-                    vscode.window.showInputBox({ prompt: 'Would you like this hotfix branch deleted after finishing? (y/n)' }).then(function(val) {
-                        if(val !== undefined && (val.toLowerCase() === 'y' ||  val.toLowerCase() === 'n')) { 
-                            var deleteBranch = val.toLowerCase() === 'y';
-                            finishHotfix(outChannel, tag, val);
-                        }
+        vscode.window.showQuickPick(itemPickList).then(function(item) {
+            if(!item) return;
+            
+            outChannel.clear();
+            if(item.label === itemPickList[0].label)
+                vscode.window.showInputBox({ prompt: 'Name of Hotfix: ' }).then(val => startHotfix(outChannel, val, initValues.master));
+            else if(item.label === itemPickList[1].label)
+                gitUtils.getBranchList(workspace.rootPath).then((hotfixes) => {
+                    var branchPickList = [];
+                    hotfixes.forEach(branchName => {
+                        if(branchName === initValues.develop)
+                            branchPickList.push( { label: initValues.develop, description: 'create hotfix branch using ' + initValues.master + ' as your base'});
+                        else
+                        branchPickList.push( { label: branchName, description: 'create hotfix branch using ' + branchName + ' as your base'});
+                    });
+                
+                    vscode.window.showQuickPick(branchPickList).then(function(item) {
+                        if(!item) return;
+                
+                        outChannel.clear();
+                        vscode.window.showInputBox({ prompt: 'Name of Release: ' }).then(val => startHotfix(outChannel, val, item.label));
                     });
                 });
-            else
-                vscode.window.showInputBox({ prompt: 'Tag this hotfix with: ' }).then(tag => finishHotfix(outChannel, tag, false));
-        }
-    });
-}
-
-function getBranchNames(outChannel, branchName) {
-    var branchList = gitUtils.getGitRepositoryPath(vscode.workspace.rootPath).then(function (gitRepositoryPath) {
-        gitUtils.getBranchList(gitRepositoryPath).then((branches) => {
-
-            var branchList = branches as string[];
-            
-            var filteredBranchList = branchList.map((value) => {
-                // if(value.replace('*', '').trim() !== configValues.develop || value.replace('*', '').trim().startsWith(configValues.hotfixes))
-                return value.replace('*', '').trim();
-            }).filter(x => !!x);
-        
-            var branchPickList = [];
-            filteredBranchList.forEach(branchName => {
-                if(branchName === initValues.develop)
-                    branchPickList.push( { label: initValues.develop, description: 'create hotfix branch using ' + initValues.master + ' as your base'});
-                else
-                branchPickList.push( { label: branchName, description: 'create hotfix branch using ' + branchName + ' as your base'});
+        });
+    }
+    else if(action === 'finish') {
+        if(askForDeletion)
+            vscode.window.showInputBox({ prompt: 'Tag this hotfix with: ' }).then(function(tag) {
+                vscode.window.showInputBox({ prompt: 'Would you like this hotfix branch deleted after finishing? (y/n)' }).then(function(val) {
+                    if(val !== undefined && (val.toLowerCase() === 'y' ||  val.toLowerCase() === 'n')) { 
+                        var deleteBranch = val.toLowerCase() === 'y';
+                        finishHotfix(outChannel, tag, val);
+                    }
+                });
             });
-        
-            vscode.window.showQuickPick(branchPickList).then(function(item) {
-                if(!item) return;
-        
-                outChannel.clear();
-                vscode.window.showInputBox({ prompt: 'Name of Release: ' }).then(val => startHotfix(outChannel, val, item.label));
-            });
-        }, genericErrorHandler);
-    });
-
-    function genericErrorHandler(error) {
-        if(error.code && error.syscall && error.code === 'ENOENT' && error.syscall === 'spawn git')
-            vscode.window.showErrorMessage('Cannot find git installation');
-        else {
-            outChannel.appendLine(error);
-            outChannel.show();
-            vscode.window.showErrorMessage('There was an error, please view details in output log');
-        }
-    } 
+        else
+            vscode.window.showInputBox({ prompt: 'Tag this hotfix with: ' }).then(tag => finishHotfix(outChannel, tag, deleteByDefault));
+    }
 }
 
 function startHotfix(outChannel, hotfixName, baseBranch) {

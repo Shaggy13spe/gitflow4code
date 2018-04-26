@@ -1,12 +1,14 @@
 'use strict';
 import * as vscode from 'vscode';
-import { workspace } from 'vscode';
+import { workspace, extensions  } from 'vscode';
 import * as path from 'path';
 import * as child_process_1 from 'child_process';
 import * as fs from 'fs';
 import * as gitUtils from '../helpers/gitUtils';
 import { InitConfigSettings } from '../settings/configSettings';
 import { BranchSetting } from '../settings/branchSettings';
+
+const api = extensions.getExtension('vscode.git').exports;
 
 /*
 A branch name can not:
@@ -47,7 +49,7 @@ function hasIllegalChars(branchName) {
 }
 
 export function initializeRepository(rootDir) {
-    return gitUtils.getGitPath().then(function(gitExecutable) {
+    return api.getGitPath().then(function(gitExecutable) {
 
         const config = workspace.getConfiguration(); 
         const configValues = config.get('gitflow4code.init') as InitConfigSettings;
@@ -107,7 +109,7 @@ export function initializeRepository(rootDir) {
 }
 
 export function startFeature(rootDir, featureName, baseBranch) {
-    return gitUtils.getGitPath().then(function (gitExecutable) {
+    return api.getGitPath().then(function (gitExecutable) {
         return new Promise(function (resolve, reject) {
             const config = workspace.getConfiguration(); 
             const configValues = config.get('gitflow4code.init') as InitConfigSettings;
@@ -158,7 +160,7 @@ export function startFeature(rootDir, featureName, baseBranch) {
 }
 
 export function finishFeature(rootDir, featureName, baseBranch, deleteBranch) {
-    return gitUtils.getGitPath().then(function (gitExecutable) {
+    return api.getGitPath().then(function (gitExecutable) {
         return new Promise(function(resolve, reject) {
             let options = { cwd: rootDir };
             let spawn = require('child_process').spawn;
@@ -223,7 +225,7 @@ export function finishFeature(rootDir, featureName, baseBranch, deleteBranch) {
 }
 
 export function startRelease(rootDir, releaseName, baseBranch) {
-    return gitUtils.getGitPath().then(function (gitExecutable) {
+    return api.getGitPath().then(function (gitExecutable) {
         return new Promise(function (resolve, reject) {
             const config = workspace.getConfiguration(); 
             const configValues = config.get('gitflow4code.init') as InitConfigSettings;
@@ -272,7 +274,7 @@ export function startRelease(rootDir, releaseName, baseBranch) {
 }
 
 export function finishRelease(rootDir, baseBranch, releaseTag, deleteBranch) {
-    return gitUtils.getGitPath().then(function (gitExecutable) {
+    return api.getGitPath().then(function (gitExecutable) {
         return new Promise(function(resolve, reject) {
             let options = { cwd: rootDir };
             let spawn = require('child_process').spawn;
@@ -406,7 +408,7 @@ export function finishRelease(rootDir, baseBranch, releaseTag, deleteBranch) {
 }
 
 export function startHotfix(rootDir, hotfixName, baseBranch) {
-    return gitUtils.getGitPath().then(function (gitExecutable) {
+    return api.getGitPath().then(function (gitExecutable) {
         return new Promise(function (resolve, reject) {
             const config = workspace.getConfiguration(); 
             const configValues = config.get('gitflow4code.init') as InitConfigSettings;
@@ -455,7 +457,7 @@ export function startHotfix(rootDir, hotfixName, baseBranch) {
 }
 
 export function finishHotfix(rootDir, baseBranch, hotfixTag, deleteBranch) {
-    return gitUtils.getGitPath().then(function (gitExecutable) {
+    return api.getGitPath().then(function (gitExecutable) {
         return new Promise(function(resolve, reject) {
             let options = { cwd: rootDir };
             let spawn = require('child_process').spawn;

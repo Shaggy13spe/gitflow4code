@@ -28,30 +28,99 @@
         "theme": "dark"
     },
     "engines": {
-        "vscode": "^1.15.0"
+        "vscode": "^1.21.0"
     },
     "tags": [
         "git",
         "gitflow"
     ],
     "activationEvents": [
-        "onCommand:gitflow.GitFlow",
         "*"
     ],
     "main": "./out/src/gitflow",
     "contributes": {
         "commands": [
             {
-                "command": "gitflow.GitFlow",
-                "title": "GitFlow: Run GitFlow commands"
+                "command": "gitflow.initialize",
+                "title": "Initialize GitFlow",
+                "category": "GitFlow"
+            },
+            {
+                "command": "gitflow.startFeature",
+                "title": "Start a Feature",
+                "category": "GitFlow"
+            },
+            {
+                "command": "gitflow.finishFeature",
+                "title": "Finish Feature",
+                "category": "GitFlow"
+            },
+            {
+                "command": "gitflow.startRelease",
+                "title": "Start a Release",
+                "category": "GitFlow"
+            },
+            {
+                "command": "gitflow.finishRelease",
+                "title": "Finish Release",
+                "category": "GitFlow"
+            },
+            {
+                "command": "gitflow.startHotfix",
+                "title": "Start a Hotfix",
+                "category": "GitFlow"
+            },
+            {
+                "command": "gitflow.finishHotfix",
+                "title": "Finish Hotfix",
+                "category": "GitFlow"
+            },
+            {
+                "command": "gitflow.gitStatus",
+                "title": "Git Status",
+                "category": "GitFlow"
             }
         ],
         "keybindings": [
             {
-                "key": "alt+ctrl+/",
-                "mac": "alt+cmd+/",
-                "command": "gitflow.GitFlow",
-                "when": "editorTextFocus"
+                "key": "alt+ctrl+/ f",
+                "mac": "alt+cmd+/ f",
+                "command": "gitflow.startFeature"
+            },
+            {
+                "key": "alt+ctrl+/ ctrl+f",
+                "mac": "alt+cmd+/ cmd+f",
+                "command": "gitflow.finishFeature"
+            },
+            {
+                "key": "alt+ctrl+/ r",
+                "mac": "alt+cmd+/ r",
+                "command": "gitflow.startRelease"
+            },
+            {
+                "key": "alt+ctrl+/ ctrl+r",
+                "mac": "alt+cmd+/ cmd+r",
+                "command": "gitflow.finishRelease"
+            },
+            {
+                "key": "alt+ctrl+/ h",
+                "mac": "alt+cmd+/ h",
+                "command": "gitflow.startHotfix"
+            },
+            {
+                "key": "alt+ctrl+/ ctrl+h",
+                "mac": "alt+cmd+/ cmd+h",
+                "command": "gitflow.finishHotfix"
+            },
+            {
+                "key": "alt+ctrl+/ i",
+                "mac": "alt+cmd+/ i",
+                "command": "gitflow.initialize"
+            },
+            {
+                "key": "alt+ctrl+/ s",
+                "mac": "alt+cmd+/ s",
+                "command": "gitflow.gitStatus"
             }
         ],
         "configuration": {
@@ -62,6 +131,11 @@
                     "type": "boolean",
                     "description": "Controls whether user is asked to confirm deletion of feature, release, and/or hotfix branches after finishing them",
                     "default": true
+                },
+                "gitflow4code.deleteBranchByDefault": {
+                    "type": "boolean",
+                    "description": "Controls deletion of feature, release, and/or hotfix branches after finishing them",
+                    "default": false
                 },
                 "gitflow4code.init": {
                     "type": "object",
@@ -158,10 +232,13 @@
         "test": "node ./node_modules/vscode/bin/test"
     },
     "devDependencies": {
-        "typescript": "^2.0.3",
-        "vscode": "^1.1.0",
-        "mocha": "^2.3.3",
+        "@types/mocha": "^2.2.32",
         "@types/node": "^6.0.40",
-        "@types/mocha": "^2.2.32"
-    }
+        "mocha": "^2.3.3",
+        "typescript": "^2.0.3",
+        "vscode": "^1.1.14"
+    },
+    "extensionDependencies": [
+        "vscode.git"
+    ]
 }

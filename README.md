@@ -1,5 +1,5 @@
 # gitflow4code
-## gitflow-avh implementation for Visual Studio Code
+## gitflow-avh Implementation for Visual Studio Code
 This extension adds support for the feature branching strategy described here in [Vincent Driessen's branching model](http://nvie.com/posts/a-successful-git-branching-model/). The implementation used by this extension is similar to the functionality offered by [git-flow (AVH Edition)](https://github.com/petervanderdoes/gitflow-avh).
 
 ### What's included
@@ -14,21 +14,19 @@ This extension adds support for the feature branching strategy described here in
 
 # Getting Started
 ## Accessing gitflow4code commands
-From the Command Pallette, type in GitFlow and choose the GitFlow: Run GitFlow commands option
+From the Command Pallette, type in GitFlow to filter the GitFlow commands
 
-![GitFlow Command](images/GitFlow-Command.png)
-
-Alternately, you can use the shortcut keys listed below to display the gitflow4code commands
-##### Shortcuts to Available Commands 
-* ⌥⌘/ on Mac
-* Ctrl+Alt+/ on Windows
-
-![Available GitFlow Commands](images/Initialize-Command.png)
+![GitFlow Command](images/FinishFeature.png)
 
 ## Initialize
 Choose the Initialize Repository command from the list of available gitflow4code commands.
 
 ![Available GitFlow Commands](images/Initialize-Command.png)
+
+Alternately, you can use the shortcut keys listed below
+##### Shortcuts to Initialize Command
+* ⌥⌘/ i on Mac
+* Ctrl+Alt+/ i on Windows
 
 ### Initialize with default settings
 Choose to `Initialize with default` (i.e. `master`, `develop`, `feature/`, `release/`, & `hotfix/`)
@@ -51,9 +49,14 @@ These settings are stored and can be edited at any time by re-running the above 
 
 ## Features
 ### Start Feature
-Choose the `Features` command from the list of available gitflow4code commands
+Choose the `Start Feature` command from the list of available gitflow4code commands
 
-![Features Command](images/Feature-Command.png)
+![Features Command](images/StartFeature-Command.png)
+
+Alternately, you can use the shortcut keys listed below
+##### Shortcuts to Start Feature Command
+* ⌥⌘/ f on Mac
+* Ctrl+Alt+/ f on Windows
 
 If creating a feature branch off of your development branch, choose `Start Feature from <develop>` (where `develop` is the name of whatever you chose to initialize your development branch) 
 
@@ -75,11 +78,25 @@ When finished with your feature, choose the `Features` command from the list of 
 
 ![Finish Feature](images/FinishFeature.png)
 
+Alternately, you can use the shortcut keys listed below
+##### Shortcuts to Finish Feature Command
+* ⌥⌘/ ⌘f on Mac
+* Ctrl+Alt+/ Ctrl+f on Windows
+
+Or, use the Finish Feature button in the status bar
+
+![Finish Feature](images/FinishFeature-Statusbar.png)
+
 ## Releases
 ### Start Release
 Choose the `Releases` command from the list of available gitflow4code commands
 
-![Releases Command](images/Release-Command.png)
+![Releases Command](images/StartRelease-Command.png)
+
+Alternately, you can use the shortcut keys listed below
+##### Shortcuts to Start Release Command
+* ⌥⌘/ r on Mac
+* Ctrl+Alt+/ r on Windows
 
 If creating a release branch off of your development branch, choose `Start Release from <develop>` (where `develop` is the name of whatever you chose to initialize your development branch) 
 
@@ -100,6 +117,15 @@ When finished with your release, choose the `Releases` command from the list of 
 
 ![Finish Release](images/FinishRelease.png)
 
+Alternately, you can use the shortcut keys listed below
+##### Shortcuts to Finish Release Command
+* ⌥⌘/ ⌘r on Mac
+* Ctrl+Alt+/ Ctrl+r on Windows
+
+Or, use the Finish Release button in the status bar
+
+![Finish Release](images/FinishRelease-Statusbar.png)
+
 Then supply the name of the `Tag` for this release
 
 ![Tag Release](images/TagRelease.png)
@@ -108,7 +134,12 @@ Then supply the name of the `Tag` for this release
 ### Start Hotfix
 Choose the `Hotfixes` command from the list of available gitflow4code commands
 
-![Hotfixes Command](images/Hotfix-Command.png)
+![Hotfixes Command](images/StartHotfix-Command.png)
+
+Alternately, you can use the shortcut keys listed below
+##### Shortcuts to Start Hotfix Command
+* ⌥⌘/ h on Mac
+* Ctrl+Alt+/ h on Windows
 
 If creating a hotfix branch off of your production branch, choose `Start Hotfix from <master>` (where `master` is the name of whatever you chose to initialize your production branch) 
 
@@ -129,6 +160,15 @@ When finished with your hotfix, choose the `Hotfixes` command from the list of a
 
 ![Finish Hotfix](images/FinishHotfix.png)
 
+Alternately, you can use the shortcut keys listed below
+##### Shortcuts to Finish Hotfix Command
+* ⌥⌘/ ⌘h on Mac
+* Ctrl+Alt+/ Ctrl+h on Windows
+
+Or, use the Finish Hotfix button in the status bar
+
+![Finish Hotfix](images/FinishHotfix-Statusbar.png)
+
 Then supply the name of the `Tag` for this hotfix
 
 ![Tag Hotfix](images/TagHotfix.png)
@@ -138,14 +178,18 @@ Then supply the name of the `Tag` for this hotfix
 Choosing this from the gitflow4code commands list will display the current status of the local git repository (same as if running `git status` on the command line) and displays it in the `OUTPUT` pane
 
 ![Git Status](images/GetStatus-Command.png)
+
+Alternately, you can use the shortcut keys listed below
+##### Shortcuts to Start Hotfix Command
+* ⌥⌘/ s on Mac
+* Ctrl+Alt+/ s on Windows
+
 ![Git Status Result](images/GetStatus-Result.png)
 
 
 # Extra
 ## gitflow4code roadmap
-* Redesign command menu
-* Add shortcut functionality to finish current feature/release/hotfix via a status bar button
-* Ability to configure whether or not local branches and/or remote tracking branches are deleted after finishing
+* Ability to configure whether or not remote tracking branches are deleted after finishing
 
 ## Help Out?
 This project is under constant development. Feedback and suggestions are very welcome and I encourage you to use the [Issues](https://github.com/Shaggy13spe/gitflow4code/issues) list on Github to provide that feedback.
