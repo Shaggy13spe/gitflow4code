@@ -15,12 +15,16 @@ import { toDisposable } from './util';
 const config = workspace.getConfiguration(); 
 const api = extensions.getExtension('vscode.git').exports;
 const initValues = config.get('gitflow4code.init') as InitConfigSettings;
+const showStatusBarFinisher = config.get('gitflow4code.showStatusBarFinisher') as boolean;
 
 async function init(context: vscode.ExtensionContext, disposables: Disposable[]): Promise<void> {
     const outChannel = window.createOutputChannel('Git');
     disposables.push(outChannel);
 
-    let statusFinisher = new FinishStatusItem();
+    if(showStatusBarFinisher) {
+        let statusFinisher = new FinishStatusItem();
+        context.subscriptions.push(statusFinisher);
+    }
 
     let initializeCommand = vscode.commands.registerCommand('gitflow.initialize', () => { initCommands.run(outChannel); });
     let startFeatureCommand = vscode.commands.registerCommand('gitflow.startFeature', () => { featureCommands.run(outChannel, 'start'); });
@@ -31,7 +35,6 @@ async function init(context: vscode.ExtensionContext, disposables: Disposable[])
     let releaseHotfixCommand = vscode.commands.registerCommand('gitflow.finishHotfix', () => { hotfixCommands.run(outChannel, 'finish'); });
     let gitStatusCommand = vscode.commands.registerCommand('gitflow.gitStatus', () => { gitCommands.run(outChannel); });
 
-    context.subscriptions.push(statusFinisher);
     context.subscriptions.push(initializeCommand);
     context.subscriptions.push(startFeatureCommand);
     context.subscriptions.push(finishFeatureCommand);
@@ -51,23 +54,8 @@ export function activate(context: vscode.ExtensionContext): any {
 
     init(context, disposables).catch(err => console.error(err));
 
-    let statusFinisher = new FinishStatusItem();
-    getCurrentBranchName(vscode.workspace.rootPath).then((branchName) => {
-        if(branchName.toString().startsWith(initValues.features)
-            || branchName.toString().startsWith(initValues.releases)
-            || branchName.toString().startsWith(initValues.hotfixes)) {
-
-            statusFinisher.showStatusItem(branchName);
-        }
-        else
-            statusFinisher.closeStatusItem();
-    });
-
-    // create file watcher to see if ./.git/HEAD has changed. If so, this an indication 
-    // that the branch has changed
-    const watcher = workspace.createFileSystemWatcher('**/.git/HEAD'); 
-
-    watcher.onDidChange(() => {
+    if(showStatusBarFinisher){
+        let statusFinisher = new FinishStatusItem();
         getCurrentBranchName(vscode.workspace.rootPath).then((branchName) => {
             if(branchName.toString().startsWith(initValues.features)
                 || branchName.toString().startsWith(initValues.releases)
@@ -78,7 +66,24 @@ export function activate(context: vscode.ExtensionContext): any {
             else
                 statusFinisher.closeStatusItem();
         });
-    });    
+
+        // create file watcher to see if ./.git/HEAD has changed. If so, this an indication 
+        // that the branch has changed
+        const watcher = workspace.createFileSystemWatcher('**/.git/HEAD'); 
+
+        watcher.onDidChange(() => {
+            getCurrentBranchName(vscode.workspace.rootPath).then((branchName) => {
+                if(branchName.toString().startsWith(initValues.features)
+                    || branchName.toString().startsWith(initValues.releases)
+                    || branchName.toString().startsWith(initValues.hotfixes)) {
+
+                    statusFinisher.showStatusItem(branchName);
+                }
+                else
+                    statusFinisher.closeStatusItem();
+            });
+        });
+    }    
 }
 
 class FinishStatusItem {

@@ -127,6 +127,11 @@
             "type": "object",
             "title": "greatminds.gitflow4code",
             "properties": {
+                "gitflow4code.showStatusBarFinisher": {
+                    "type": "boolean",
+                    "description": "Controls whether or not the 'Finish' status bar button is displayed",
+                    "default": true 
+                },
                 "gitflow4code.askBeforeDeletion": {
                     "type": "boolean",
                     "description": "Controls whether user is asked to confirm deletion of feature, release, and/or hotfix branches after finishing them",
