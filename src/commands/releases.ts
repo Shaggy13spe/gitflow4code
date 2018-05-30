@@ -68,12 +68,14 @@ export function run(outChannel, action) {
 
 function startRelease(outChannel, releaseName, baseBranch) {
     if(releaseName !== undefined) // User chose to Cancel/Esc operation
-        if(releaseName !== '')
+        if(releaseName !== '') {
+            releaseName = releaseName.trim().replace(/ /g, '_');
             gitUtils.getGitRepositoryPath(vscode.workspace.rootPath).then(function (gitRepositoryPath) {
                 gitflowUtils.startRelease(gitRepositoryPath, releaseName, baseBranch)
                     .then(startRelease, genericErrorHandler)
                     .catch(genericErrorHandler)
             }).catch(genericErrorHandler);
+        }
         else
             genericErrorHandler('Name of release cannot be blank');
 
