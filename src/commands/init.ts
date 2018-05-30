@@ -25,7 +25,7 @@ export function run(outChannel) {
             initializeWithDefaults(outChannel);
         else {
             outChannel.clear();
-            vscode.window.showInputBox({ prompt: 'Branch name for production releases: [master]'}).then(val => setMaster(outChannel, configSettings, val));
+            vscode.window.showInputBox({ prompt: 'Branch name for production releases: [master]', ignoreFocusOut: true}).then(val => setMaster(outChannel, configSettings, val));
         }
     });
 }
@@ -33,25 +33,25 @@ export function run(outChannel) {
 function setMaster(outChannel, configSettings, val) {
     if(val !== '')
         configSettings.master = val;
-    vscode.window.showInputBox({ prompt: 'Branch name for "next release" development: [develop]'}).then(val => setDevelop(outChannel, configSettings, val));
+    vscode.window.showInputBox({ prompt: 'Branch name for "next release" development: [develop]', ignoreFocusOut: true}).then(val => setDevelop(outChannel, configSettings, val));
 }
 
 function setDevelop(outChannel, configSettings, val) {
     if(val !== '')
         configSettings.develop = val;
-    vscode.window.showInputBox({ prompt: 'Feature branch development: [feature/]'}).then(val => setFeature(outChannel, configSettings, val));
+    vscode.window.showInputBox({ prompt: 'Feature branch development: [feature/]', ignoreFocusOut: true}).then(val => setFeature(outChannel, configSettings, val));
 }
 
 function setFeature(outChannel, configSettings, val) {
     if(val !== '')
         configSettings.features = val;
-    vscode.window.showInputBox({ prompt: 'Release branch development: [release/]'}).then(val => setRelease(outChannel, configSettings, val));
+    vscode.window.showInputBox({ prompt: 'Release branch development: [release/]', ignoreFocusOut: true}).then(val => setRelease(outChannel, configSettings, val));
 }
 
 function setRelease(outChannel, configSettings, val) {
     if(val !== '')
         configSettings.releases = val;
-    vscode.window.showInputBox({ prompt: 'Hotfix branch development: [hotfix/]'}).then(val => setHotfix(outChannel, configSettings, val));
+    vscode.window.showInputBox({ prompt: 'Hotfix branch development: [hotfix/]', ignoreFocusOut: true}).then(val => setHotfix(outChannel, configSettings, val));
 }
 
 function setHotfix(outChannel, configSettings, val) {
