@@ -65,12 +65,14 @@ export function run(outChannel, action) {
 
 function startHotfix(outChannel, hotfixName, baseBranch) {
     if(hotfixName !== undefined) // User chose to Cancel/Esc operation
-        if(hotfixName !== '')
+        if(hotfixName !== '') {
+            hotfixName = hotfixName.trim().replace(/ /g, '_');
             gitUtils.getGitRepositoryPath(vscode.workspace.rootPath).then(function (gitRepositoryPath) {
                 gitflowUtils.startHotfix(gitRepositoryPath, hotfixName, baseBranch)
                     .then(startHotfix, genericErrorHandler)
                     .catch(genericErrorHandler)
             }).catch(genericErrorHandler);
+        }
         else
             genericErrorHandler('Name of hotfix cannot be blank');
 

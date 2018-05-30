@@ -114,8 +114,6 @@ export function startFeature(rootDir, featureName, baseBranch) {
             const config = workspace.getConfiguration(); 
             const configValues = config.get('gitflow4code.init') as InitConfigSettings;
             const featurePrefix = configValues.features;
-
-            featureName = featureName.replace(/ /g, '_');
             
             if(hasIllegalChars(featureName)) 
                 reject('Branch name has illegal characters\n' +
@@ -230,8 +228,6 @@ export function startRelease(rootDir, releaseName, baseBranch) {
             const config = workspace.getConfiguration(); 
             const configValues = config.get('gitflow4code.init') as InitConfigSettings;
             const releasePrefix = configValues.releases;
-
-            releaseName = releaseName.replace(/ /g, '_');
             
             if(hasIllegalChars(releaseName)) 
                 reject('Branch name has illegal characters\n' +
@@ -413,8 +409,6 @@ export function startHotfix(rootDir, hotfixName, baseBranch) {
             const config = workspace.getConfiguration(); 
             const configValues = config.get('gitflow4code.init') as InitConfigSettings;
             const hotfixPrefix = configValues.hotfixes;
-
-            hotfixName = hotfixName.replace(/ /g, '_');
             
             if(hasIllegalChars(hotfixName)) 
                 reject('Branch name has illegal characters\n' +

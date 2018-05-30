@@ -65,12 +65,14 @@ export function run(outChannel, action) {
 
 function startFeature(outChannel, featureName, baseBranch) {
     if(featureName !== undefined) // User chose to Cancel/Esc operation
-        if(featureName !== '')
+        if(featureName !== '') {
+            featureName = featureName.trim().replace(/ /g, '_');
             gitUtils.getGitRepositoryPath(vscode.workspace.rootPath).then(function (gitRepositoryPath) {
                 gitflowUtils.startFeature(gitRepositoryPath, featureName, baseBranch)
                     .then(startFeature, genericErrorHandler)
                     .catch(genericErrorHandler)
             }).catch(genericErrorHandler);
+        }
         else
             genericErrorHandler('Name of feature cannot be blank');
 
