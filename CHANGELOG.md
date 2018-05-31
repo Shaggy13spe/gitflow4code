@@ -6,13 +6,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [1.2.2] - 2018-5-30
 ### Added
-- [Issue #9](https://github.com/Shaggy13spe/gitflow4code/issues/9)
+- [Issue #7](https://github.com/Shaggy13spe/gitflow4code/issues/7) Ability to switch applications while input box is shown and not having it disappear
 ### Fixed
-- [Issue #10](https://github.com/Shaggy13spe/gitflow4code/issues/10)
+- [Issue #10](https://github.com/Shaggy13spe/gitflow4code/issues/10) Fixed when naming a branch with spaces caused bad merging in to develop instead of defined base branch
 
 ## [1.2.1] - 2018-4-29
 ### Added
-- New configuration value, showStatusBarFinisher. Defaulted to true, set to false to not show the new "Finish" status bar button introduced in 1.2.0 release. Given that there may be many extensions installed that utilize the status bar, it can become quite crowded, this allows you to make it a little less so if you find the button not really needed in your set up.
+- [Issue #6](https://github.com/Shaggy13spe/gitflow4code/issues/6) New configuration value, showStatusBarFinisher. Defaulted to true, set to false to not show the new "Finish" status bar button introduced in 1.2.0 release. Given that there may be many extensions installed that utilize the status bar, it can become quite crowded, this allows you to make it a little less so if you find the button not really needed in your set up.
 
 ## [1.2.0] - 2018-4-25
 ### Added
@@ -25,9 +25,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [1.1.0] - 2018-4-16
 ### Added
-- Ability to create release and/or hotfix branches based on branches other than default branch ("development" and "production" respectively)
+- [Issue #3](https://github.com/Shaggy13spe/gitflow4code/issues/3) Ability to create release and/or hotfix branches based on branches other than default branch ("development" and "production" respectively)
 ### Changed
-- Ability to now create feature branches based on branches other than "development" branch, prior release only allowed to create features off of either development or another "feature"
+- [Issue #3](https://github.com/Shaggy13spe/gitflow4code/issues/3) Ability to now create feature branches based on branches other than "development" branch, prior release only allowed to create features off of either development or another "feature"
 
 ## [1.0.0] - 2017-9-14
 ### Added
@@ -52,7 +52,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Removed need for gitflow or gitflow-avh to be installed prior to using the extension. All commands now run organic git commands
 
 ### Fixed
-- Error that occurred when trying to use the extension that claimed there wasn't a git repo in the current or any parent folder
+- [Issue #1](https://github.com/Shaggy13spe/gitflow4code/issues/1) Error that occurred when trying to use the extension that claimed there wasn't a git repo in the current or any parent folder
 
 ## [0.0.5] - 2017-1-26
 ### Added
