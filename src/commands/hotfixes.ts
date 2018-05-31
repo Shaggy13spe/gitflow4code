@@ -28,7 +28,7 @@ export function run(outChannel, action) {
             
             outChannel.clear();
             if(item.label === itemPickList[0].label)
-                vscode.window.showInputBox({ prompt: 'Name of Hotfix: ' }).then(val => startHotfix(outChannel, val, initValues.master));
+                vscode.window.showInputBox({ prompt: 'Name of Hotfix: ', ignoreFocusOut: true }).then(val => startHotfix(outChannel, val, initValues.master));
             else if(item.label === itemPickList[1].label)
                 gitUtils.getBranchList(workspace.rootPath).then((hotfixes) => {
                     var branchPickList = [];
@@ -43,15 +43,15 @@ export function run(outChannel, action) {
                         if(!item) return;
                 
                         outChannel.clear();
-                        vscode.window.showInputBox({ prompt: 'Name of Release: ' }).then(val => startHotfix(outChannel, val, item.label));
+                        vscode.window.showInputBox({ prompt: 'Name of Hotfix: ', ignoreFocusOut: true }).then(val => startHotfix(outChannel, val, item.label));
                     });
                 });
         });
     }
     else if(action === 'finish') {
         if(askForDeletion)
-            vscode.window.showInputBox({ prompt: 'Tag this hotfix with: ' }).then(function(tag) {
-                vscode.window.showInputBox({ prompt: 'Would you like this hotfix branch deleted after finishing? (y/n)' }).then(function(val) {
+            vscode.window.showInputBox({ prompt: 'Tag this hotfix with: ', ignoreFocusOut: true }).then(function(tag) {
+                vscode.window.showInputBox({ prompt: 'Would you like this hotfix branch deleted after finishing? (y/n)', ignoreFocusOut: true }).then(function(val) {
                     if(val !== undefined && (val.toLowerCase() === 'y' ||  val.toLowerCase() === 'n')) { 
                         var deleteBranch = val.toLowerCase() === 'y';
                         finishHotfix(outChannel, tag, val);
@@ -59,18 +59,20 @@ export function run(outChannel, action) {
                 });
             });
         else
-            vscode.window.showInputBox({ prompt: 'Tag this hotfix with: ' }).then(tag => finishHotfix(outChannel, tag, deleteByDefault));
+            vscode.window.showInputBox({ prompt: 'Tag this hotfix with: ', ignoreFocusOut: true }).then(tag => finishHotfix(outChannel, tag, deleteByDefault));
     }
 }
 
 function startHotfix(outChannel, hotfixName, baseBranch) {
     if(hotfixName !== undefined) // User chose to Cancel/Esc operation
-        if(hotfixName !== '')
+        if(hotfixName !== '') {
+            hotfixName = hotfixName.trim().replace(/ /g, '_');
             gitUtils.getGitRepositoryPath(vscode.workspace.rootPath).then(function (gitRepositoryPath) {
                 gitflowUtils.startHotfix(gitRepositoryPath, hotfixName, baseBranch)
                     .then(startHotfix, genericErrorHandler)
                     .catch(genericErrorHandler)
             }).catch(genericErrorHandler);
+        }
         else
             genericErrorHandler('Name of hotfix cannot be blank');
 
@@ -112,7 +114,7 @@ function finishHotfix(outChannel, hotfixTag, deleteBranch) {
                 if(deleteBranch) {
                     let hotfixIndex = hotfixesConfig.indexOf(hotfixSetting);
                     hotfixesConfig.splice(hotfixIndex, 1);
-                    config.update('gitflow4code.releases', hotfixesConfig);
+                    config.update('gitflow4code.hotfixes', hotfixesConfig);
                 }
                 
                 outChannel.append(log);

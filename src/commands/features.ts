@@ -29,7 +29,7 @@ export function run(outChannel, action) {
             
             outChannel.clear();
             if(item.label === itemPickList[0].label) 
-                vscode.window.showInputBox({ prompt: 'Name of Feature: ' }).then(val => startFeature(outChannel, val, initValues.develop));
+                vscode.window.showInputBox({ prompt: 'Name of Feature: ', ignoreFocusOut: true }).then(val => startFeature(outChannel, val, initValues.develop));
             else {
                 gitUtils.getBranchList(workspace.rootPath).then((features) => {
                     var branchPickList = [];
@@ -44,7 +44,7 @@ export function run(outChannel, action) {
                         if(!item) return;
                 
                         outChannel.clear();
-                        vscode.window.showInputBox({ prompt: 'Name of Feature: ' }).then(val => startFeature(outChannel, val, item.label));
+                        vscode.window.showInputBox({ prompt: 'Name of Feature: ', ignoreFocusOut: true }).then(val => startFeature(outChannel, val, item.label));
                     });
                 });
             }
@@ -52,7 +52,7 @@ export function run(outChannel, action) {
     }
     else if (action === 'finish') {
         if(askForDeletion)
-            vscode.window.showInputBox({ prompt: 'Would you like this feature branch deleted after finishing? (y/n)' }).then(function(val) {
+            vscode.window.showInputBox({ prompt: 'Would you like this feature branch deleted after finishing? (y/n)', ignoreFocusOut: true }).then(function(val) {
                 if(val !== undefined && (val.toLowerCase() === 'y' ||  val.toLowerCase() === 'n')) { 
                     var deleteBranch = val.toLowerCase() === 'y';
                     finishFeature(outChannel, deleteBranch); 
@@ -65,12 +65,14 @@ export function run(outChannel, action) {
 
 function startFeature(outChannel, featureName, baseBranch) {
     if(featureName !== undefined) // User chose to Cancel/Esc operation
-        if(featureName !== '')
+        if(featureName !== '') {
+            featureName = featureName.trim().replace(/ /g, '_');
             gitUtils.getGitRepositoryPath(vscode.workspace.rootPath).then(function (gitRepositoryPath) {
                 gitflowUtils.startFeature(gitRepositoryPath, featureName, baseBranch)
                     .then(startFeature, genericErrorHandler)
                     .catch(genericErrorHandler)
             }).catch(genericErrorHandler);
+        }
         else
             genericErrorHandler('Name of feature cannot be blank');
 
