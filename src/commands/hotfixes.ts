@@ -81,6 +81,10 @@ function startHotfix(outChannel, hotfixName, baseBranch) {
             vscode.window.showInformationMessage('Nothing to show');
             return;
         }
+
+        let hotfixesConfig = config.get('gitflow4code.hotfixes') as BranchSetting[];
+        hotfixesConfig.push(new BranchSetting(initValues.hotfixes + hotfixName, baseBranch));
+        config.update('gitflow4code.hotfixes', hotfixesConfig);
         
         outChannel.append(log);
         outChannel.show();
