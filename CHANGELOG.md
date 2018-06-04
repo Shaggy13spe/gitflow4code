@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.2.3] - 2018-6-4
+### Fixed
+- [Issue #12](https://github.com/Shaggy13spe/gitflow4code/issues/12) Fixed hotfix branches not being merged in to master when finished
+
 ## [1.2.2] - 2018-5-30
 ### Added
 - [Issue #7](https://github.com/Shaggy13spe/gitflow4code/issues/7) Ability to switch applications while input box is shown and not having it disappear
