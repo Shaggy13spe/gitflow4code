@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.2.4]
+### Changed
+- Upgraded TypeScript compilation to task version 2.0.0 per [VS Code authors' request](https://code.visualstudio.com/docs/extensions/developing-extensions#_compiling-typescript)
+
 ## [1.2.3] - 2018-6-4
 ### Fixed
 - [Issue #12](https://github.com/Shaggy13spe/gitflow4code/issues/12) Fixed hotfix branches not being merged in to master when finished
