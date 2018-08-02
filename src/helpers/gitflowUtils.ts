@@ -32,7 +32,7 @@ function hasIllegalChars(branchName) {
         if(index === branchName.length - 5)
             return true;
     }
-    else if(branchName.indexOf('.') >= 0)
+    else if(branchName.indexOf('/.') >= 0)
         return true;
     else if(branchName.indexOf('..') >= 0)
         return true;
