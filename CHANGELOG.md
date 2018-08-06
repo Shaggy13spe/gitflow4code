@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.2.5]
+### Fixed
+- Merged Pull Request for [Issue #17](https://github.com/Shaggy13spe/gitflow4code/pull/17). Fix for allowing dot '.' in git branch name path as long as it is not the beginning of the path. Thanks to [Vasily Pikulev](https://github.com/pikulev)
+
 ## [1.2.4]
 ### Changed
 - Upgraded TypeScript compilation to task version 2.0.0 per [VS Code authors' request](https://code.visualstudio.com/docs/extensions/developing-extensions#_compiling-typescript)
