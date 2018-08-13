@@ -18,7 +18,7 @@ const initValues = config.get('gitflow4code.init') as InitConfigSettings;
 const showStatusBarFinisher = config.get('gitflow4code.showStatusBarFinisher') as boolean;
 
 async function init(context: vscode.ExtensionContext, disposables: Disposable[]): Promise<void> {
-    const outChannel = window.createOutputChannel('Git');
+    const outChannel = window.createOutputChannel('GitFlow4Code');
     disposables.push(outChannel);
 
     if(showStatusBarFinisher) {
