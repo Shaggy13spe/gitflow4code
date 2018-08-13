@@ -8,8 +8,9 @@ import { BranchSetting } from '../settings/branchSettings';
 
 const config = workspace.getConfiguration();
 const initValues = config.get('gitflow4code.init') as InitConfigSettings;
-const askForDeletion = config.get('gitflow4code.askBeforeDeletion') as Boolean;
-const deleteByDefault = config.get('gitflow4code.deleteBranchByDefault') as Boolean;
+const askForDeletion = config.get('gitflow4code.askBeforeDeletion') as boolean;
+const deleteByDefault = config.get('gitflow4code.deleteBranchByDefault') as boolean;
+const pushAfterFinishing = config.get('gitflow4code.pushAfterFinishing') as boolean;
 
 export function run(outChannel, action) {
     if(action === 'start') {
@@ -83,7 +84,7 @@ function startHotfix(outChannel, hotfixName, baseBranch) {
         }
 
         let hotfixesConfig = config.get('gitflow4code.hotfixes') as BranchSetting[];
-        hotfixesConfig.push(new BranchSetting(initValues.hotfixes + hotfixName, baseBranch));
+        hotfixesConfig.push(new BranchSetting(initValues.hotfixes + hotfixName, baseBranch, pushAfterFinishing));
         config.update('gitflow4code.hotfixes', hotfixesConfig);
         
         outChannel.append(log);
@@ -106,7 +107,7 @@ function finishHotfix(outChannel, hotfixTag, deleteBranch) {
             let hotfixesConfig = config.get('gitflow4code.hotfixes') as BranchSetting[];
             let hotfixSetting = hotfixesConfig.find((hotfix) => hotfix.name === branchName.toString());
             if(!hotfixSetting)
-                hotfixSetting = new BranchSetting(branchName.toString(), initValues.develop);
+                hotfixSetting = new BranchSetting(branchName.toString(), initValues.develop, pushAfterFinishing);
 
             gitflowUtils.finishHotfix(gitRepositoryPath, hotfixSetting.base, hotfixTag, deleteBranch).then(finishHotfix, genericErrorHandler);
             function finishHotfix(log) {

@@ -8,8 +8,9 @@ import { BranchSetting } from '../settings/branchSettings';
 
 const config = workspace.getConfiguration(); 
 const initValues = config.get('gitflow4code.init') as InitConfigSettings;
-const askForDeletion = config.get('gitflow4code.askBeforeDeletion') as Boolean;
-const deleteByDefault = config.get('gitflow4code.deleteBranchByDefault') as Boolean;
+const askForDeletion = config.get('gitflow4code.askBeforeDeletion') as boolean;
+const deleteByDefault = config.get('gitflow4code.deleteBranchByDefault') as boolean;
+const pushAfterFinishing = config.get('gitflow4code.pushAfterFinishing') as boolean;
 
 export function run(outChannel, action) {
     if(action === 'start') {
@@ -83,7 +84,7 @@ function startFeature(outChannel, featureName, baseBranch) {
         }
 
         let featuresConfig = config.get('gitflow4code.features') as BranchSetting[];
-        featuresConfig.push(new BranchSetting(initValues.features + featureName, baseBranch));
+        featuresConfig.push(new BranchSetting(initValues.features + featureName, baseBranch, pushAfterFinishing));
         config.update('gitflow4code.features', featuresConfig);
         
         outChannel.append(log);
@@ -107,7 +108,7 @@ function finishFeature(outChannel, deleteBranch) {
                 let featuresConfig = config.get('gitflow4code.features') as BranchSetting[];
                 let featureSetting = featuresConfig.find((feature) => feature.name === branchName.toString());
                 if(!featureSetting) 
-                    featureSetting = new BranchSetting(branchName.toString(), initValues.develop);
+                    featureSetting = new BranchSetting(branchName.toString(), initValues.develop, pushAfterFinishing);
 
                 gitflowUtils.finishFeature(gitRepositoryPath, branchName.toString(), featureSetting.base, deleteBranch).then(finishFeature, genericErrorHandler);
                 function finishFeature(log) {

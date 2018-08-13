@@ -8,8 +8,9 @@ import { BranchSetting } from '../settings/branchSettings';
 
 const config = workspace.getConfiguration();
 const initValues = config.get('gitflow4code.init') as InitConfigSettings;
-const askForDeletion = config.get('gitflow4code.askBeforeDeletion') as Boolean;
-const deleteByDefault = config.get('gitflow4code.deleteBranchByDefault') as Boolean;
+const askForDeletion = config.get('gitflow4code.askBeforeDeletion') as boolean;
+const deleteByDefault = config.get('gitflow4code.deleteBranchByDefault') as boolean;
+const pushAfterFinishing = config.get('gitflow4code.pushAfterFinishing') as boolean;
 
 export function run(outChannel, action) {
     if(action === 'start') {
@@ -86,7 +87,7 @@ function startRelease(outChannel, releaseName, baseBranch) {
         }
 
         let releasesConfig = config.get('gitflow4code.releases') as BranchSetting[];
-        releasesConfig.push(new BranchSetting(initValues.releases + releaseName, baseBranch));
+        releasesConfig.push(new BranchSetting(initValues.releases + releaseName, baseBranch, pushAfterFinishing));
         config.update('gitflow4code.releases', releasesConfig);
         
         outChannel.append(log);
@@ -109,7 +110,7 @@ function finishRelease(outChannel, releaseTag, deleteBranch) {
             let releasesConfig = config.get('gitflow4code.releases') as BranchSetting[];
             let releaseSetting = releasesConfig.find((release) => release.name === branchName.toString());
             if(!releaseSetting)
-                releaseSetting = new BranchSetting(branchName.toString(), initValues.develop);
+                releaseSetting = new BranchSetting(branchName.toString(), initValues.develop, pushAfterFinishing);
             
             gitflowUtils.finishRelease(gitRepositoryPath, releaseSetting.base, releaseTag, deleteBranch).then(finishRelease, genericErrorHandler);
             function finishRelease(log) {
