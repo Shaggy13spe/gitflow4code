@@ -187,9 +187,9 @@ Alternately, you can use the shortcut keys listed below
 ![Git Status Result](images/GetStatus-Result.png)
 
 
-# Extra
-## gitflow4code roadmap
-* Ability to configure whether or not remote tracking branches are deleted after finishing
+# gitflow4code roadmap
+See our [enhancements list](https://github.com/Shaggy13spe/gitflow4code/issues?q=is%3Aopen+is%3Aissue+label%3Aenhancement) for future plans
+
 
 ## Help Out?
 This project is under constant development. Feedback and suggestions are very welcome and I encourage you to use the [Issues](https://github.com/Shaggy13spe/gitflow4code/issues) list on Github to provide that feedback.

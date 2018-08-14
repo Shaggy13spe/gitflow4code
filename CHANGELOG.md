@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [1.2.5]
+### Added
+- [Issue #11](https://github.com/Shaggy13spe/gitflow4code/issues/11) Added ability to configure if feature base branches are automatically pushed to origin after finishing and merging them
 ### Fixed
 - Merged Pull Request for [Issue #17](https://github.com/Shaggy13spe/gitflow4code/pull/17). Fix for allowing dot '.' in git branch name path as long as it is not the beginning of the path. Thanks to [Vasily Pikulev](https://github.com/pikulev)
 

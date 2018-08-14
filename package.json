@@ -144,7 +144,7 @@
                 },
                 "gitflow4code.pushAfterFinishing": {
                     "type": "boolean",
-                    "description": "Controls whether user is asked to confirm deletion of feature, release, and/or hotfix branches after finishing them",
+                    "description": "Default global setting, controls whether base branches are pushed to origin (if exist) after feature branches are finished and merged to them",
                     "default": false
                 },
                 "gitflow4code.init": {
@@ -174,7 +174,7 @@
                             },
                             "pushAfterFinishing": {
                                 "type": "boolean",
-                                "description": "Controls if base branches are pushed to origin after finishing feature branch",
+                                "description": "Controls if base branches are pushed to origin after finishing feature branch, default is set via the global default setting, but can be controlled individually as well",
                                 "default": false
                             }
                         }

@@ -9,6 +9,9 @@ import { InitConfigSettings } from '../settings/configSettings';
 import { BranchSetting } from '../settings/branchSettings';
 
 const api = extensions.getExtension('vscode.git').exports;
+const config = workspace.getConfiguration(); 
+const initValues = config.get('gitflow4code.init') as InitConfigSettings;
+
 
 /*
 A branch name can not:
@@ -157,14 +160,14 @@ export function startFeature(rootDir, featureName, baseBranch) {
     });
 }
 
-export function finishFeature(rootDir, featureName, baseBranch, deleteBranch) {
+export function finishFeature(rootDir, featureName, baseBranch, deleteBranch, options) {
     return api.getGitPath().then(function (gitExecutable) {
         return new Promise(function(resolve, reject) {
-            let options = { cwd: rootDir };
+            let gitOptions = { cwd: rootDir };
             let spawn = require('child_process').spawn;
             let log = '';
             let error = '';
-            let ls1 = spawn(gitExecutable, ['checkout', baseBranch], options);
+            let ls1 = spawn(gitExecutable, ['checkout', baseBranch], gitOptions);
             ls1.stdout.on('data', function (data) {
                 log += data + '\n';
             });
@@ -177,7 +180,7 @@ export function finishFeature(rootDir, featureName, baseBranch, deleteBranch) {
                     return;
                 }
 
-                let ls2 = spawn(gitExecutable, ['merge', '--no-ff', featureName], options);
+                let ls2 = spawn(gitExecutable, ['merge', '--no-ff', featureName], gitOptions);
                 ls2.stdout.on('data', function (data) {
                     log += data + '\n';
                 });
@@ -185,8 +188,12 @@ export function finishFeature(rootDir, featureName, baseBranch, deleteBranch) {
                     error += data;
                 });
                 ls2.on('exit', function (code) {
+                    if(code > 0) {
+                        reject(error);
+                        return;
+                    }
                     if(deleteBranch) {
-                        let ls3 = spawn(gitExecutable, ['branch', '-d', featureName], options);
+                        let ls3 = spawn(gitExecutable, ['branch', '-d', featureName], gitOptions);
                         ls3.stdout.on('data', function (data) {
                             log += data + '\n';
                         });
@@ -197,24 +204,64 @@ export function finishFeature(rootDir, featureName, baseBranch, deleteBranch) {
                             if(code > 0) {
                                 reject(error);
                                 return;
+                            } 
+                            if(options.pushToOrigin) {
+                                let ls4 = spawn(gitExecutable, ['push', 'origin', initValues.develop], gitOptions);
+                                ls4.stdout.on('data', function (data) {
+                                    log += data + '\n';
+                                });
+                                ls4.stderr.on('data', function (data) {
+                                    error += data;
+                                });
+                                ls4.on('exit', function (code) {
+                                    if(code > 0) {
+                                        reject(error);
+                                        return;
+                                    }
+                                    var message = log;
+                                    if(code === 0 && error.length > 0)
+                                        message += '\n\n' + error;
+                                        
+                                    resolve(message);
+                                });
                             }
+                            else {
+                                var message = log;
+                                if(code === 0 && error.length > 0)
+                                    message += '\n\n' + error;
+                                    
+                                resolve(message);
+                            }
+                        });
+                    }
+                    else {
+                        if(options.pushToOrigin) {
+                            let ls3 = spawn(gitExecutable, ['push', 'origin', initValues.develop], gitOptions);
+                            ls3.stdout.on('data', function (data) {
+                                log += data + '\n';
+                            });
+                            ls3.stderr.on('data', function (data) {
+                                error += data;
+                            });
+                            ls3.on('exit', function (code) {
+                                if(code > 0) {
+                                    reject(error);
+                                    return;
+                                }
+                                var message = log;
+                                if(code === 0 && error.length > 0)
+                                    message += '\n\n' + error;
+                                    
+                                resolve(message);
+                            });
+                        }
+                        else {
                             var message = log;
                             if(code === 0 && error.length > 0)
                                 message += '\n\n' + error;
                                 
                             resolve(message);
-                        });
-                    }
-                    else {
-                        if(code > 0) {
-                            reject(error);
-                            return;
                         }
-                        var message = log;
-                        if(code === 0 && error.length > 0)
-                            message += '\n\n' + error;
-                            
-                        resolve(message);
                     }
                 });
             });
@@ -272,9 +319,9 @@ export function startRelease(rootDir, releaseName, baseBranch) {
 export function finishRelease(rootDir, baseBranch, releaseTag, deleteBranch) {
     return api.getGitPath().then(function (gitExecutable) {
         return new Promise(function(resolve, reject) {
-            let options = { cwd: rootDir };
+            let gitOptions = { cwd: rootDir };
             let spawn = require('child_process').spawn;
-            let ls1 = spawn(gitExecutable, ['rev-parse', '--abbrev-ref', 'HEAD'], options);
+            let ls1 = spawn(gitExecutable, ['rev-parse', '--abbrev-ref', 'HEAD'], gitOptions);
             var branchData = '';
             var inRelease = false;
             var currentBranch = '';
@@ -302,7 +349,7 @@ export function finishRelease(rootDir, baseBranch, releaseTag, deleteBranch) {
                     reject('Not currently on a Release branch');
                     return;
                 }
-                let ls2 = spawn(gitExecutable, ['checkout', configValues.master], options);
+                let ls2 = spawn(gitExecutable, ['checkout', configValues.master], gitOptions);
                 ls2.stdout.on('data', function (data) {
                     log += data + '\n';
                 });
@@ -315,7 +362,7 @@ export function finishRelease(rootDir, baseBranch, releaseTag, deleteBranch) {
                         return;
                     }
     
-                    let ls3 = spawn(gitExecutable, ['merge', '--no-ff', currentBranch], options);
+                    let ls3 = spawn(gitExecutable, ['merge', '--no-ff', currentBranch], gitOptions);
                     ls3.stdout.on('data', function (data) {
                         log += data + '\n';
                     });
@@ -328,7 +375,7 @@ export function finishRelease(rootDir, baseBranch, releaseTag, deleteBranch) {
                             return;
                         }
                         
-                        let ls4 = spawn(gitExecutable, ['tag', releaseTag], options);
+                        let ls4 = spawn(gitExecutable, ['tag', '-a', releaseTag], gitOptions);
                         ls4.stdout.on('data', function (data) {
                             log += data + '\n';
                         });
@@ -341,7 +388,7 @@ export function finishRelease(rootDir, baseBranch, releaseTag, deleteBranch) {
                                 return;
                             }
             
-                            let ls5 = spawn(gitExecutable, ['checkout', baseBranch], options);
+                            let ls5 = spawn(gitExecutable, ['checkout', baseBranch], gitOptions);
                             ls5.stdout.on('data', function (data) {
                                 log += data + '\n';
                             });
@@ -354,7 +401,7 @@ export function finishRelease(rootDir, baseBranch, releaseTag, deleteBranch) {
                                     return;
                                 }
                 
-                                let ls6 = spawn(gitExecutable, ['merge', '--no-ff', currentBranch], options);
+                                let ls6 = spawn(gitExecutable, ['merge', '--no-ff', currentBranch], gitOptions);
                                 ls6.stdout.on('data', function (data) {
                                     log += data + '\n';
                                 });
@@ -362,15 +409,19 @@ export function finishRelease(rootDir, baseBranch, releaseTag, deleteBranch) {
                                     error += data;
                                 });
                                 ls6.on('exit', function (code) {
+                                    if(code > 0) {
+                                        reject(error);
+                                        return;
+                                    }
                                     if(deleteBranch) {
-                                        let ls6 = spawn(gitExecutable, ['branch', '-d', currentBranch], options);
-                                        ls6.stdout.on('data', function (data) {
+                                        let ls7 = spawn(gitExecutable, ['branch', '-d', currentBranch], gitOptions);
+                                        ls7.stdout.on('data', function (data) {
                                             log += data + '\n';
                                         });
-                                        ls6.stderr.on('data', function (data) {
+                                        ls7.stderr.on('data', function (data) {
                                             error += data;
                                         });
-                                        ls6.on('exit', function (code) {
+                                        ls7.on('exit', function (code) {
                                             if(code > 0) {
                                                 reject(error);
                                                 return;
@@ -383,10 +434,6 @@ export function finishRelease(rootDir, baseBranch, releaseTag, deleteBranch) {
                                         });
                                     }
                                     else {
-                                        if(code > 0) {
-                                            reject(error);
-                                            return;
-                                        }
                                         var message = log;
                                         if(code === 0 && error.length > 0)
                                             message += '\n\n' + error;
@@ -453,9 +500,9 @@ export function startHotfix(rootDir, hotfixName, baseBranch) {
 export function finishHotfix(rootDir, baseBranch, hotfixTag, deleteBranch) {
     return api.getGitPath().then(function (gitExecutable) {
         return new Promise(function(resolve, reject) {
-            let options = { cwd: rootDir };
+            let gitOptions = { cwd: rootDir };
             let spawn = require('child_process').spawn;
-            let ls1 = spawn(gitExecutable, ['rev-parse', '--abbrev-ref', 'HEAD'], options);
+            let ls1 = spawn(gitExecutable, ['rev-parse', '--abbrev-ref', 'HEAD'], gitOptions);
             var branchData = '';
             var inHotfix = false;
             var currentBranch = '';
@@ -483,7 +530,7 @@ export function finishHotfix(rootDir, baseBranch, hotfixTag, deleteBranch) {
                     reject('Not currently on a Hotfix branch');
                     return;
                 }
-                let ls2 = spawn(gitExecutable, ['checkout', baseBranch], options);
+                let ls2 = spawn(gitExecutable, ['checkout', baseBranch], gitOptions);
                 ls2.stdout.on('data', function (data) {
                     log += data + '\n';
                 });
@@ -496,7 +543,7 @@ export function finishHotfix(rootDir, baseBranch, hotfixTag, deleteBranch) {
                         return;
                     }
     
-                    let ls3 = spawn(gitExecutable, ['merge', '--no-ff', currentBranch], options);
+                    let ls3 = spawn(gitExecutable, ['merge', '--no-ff', currentBranch], gitOptions);
                     ls3.stdout.on('data', function (data) {
                         log += data + '\n';
                     });
@@ -509,7 +556,7 @@ export function finishHotfix(rootDir, baseBranch, hotfixTag, deleteBranch) {
                             return;
                         }
 
-                        let ls4 = spawn(gitExecutable, ['tag', hotfixTag], options);
+                        let ls4 = spawn(gitExecutable, ['tag', '-a', hotfixTag], gitOptions);
                         ls4.stdout.on('data', function (data) {
                             log += data + '\n';
                         });
@@ -522,7 +569,7 @@ export function finishHotfix(rootDir, baseBranch, hotfixTag, deleteBranch) {
                                 return;
                             }
             
-                            let ls5 = spawn(gitExecutable, ['checkout', configValues.develop], options);
+                            let ls5 = spawn(gitExecutable, ['checkout', configValues.develop], gitOptions);
                             ls5.stdout.on('data', function (data) {
                                 log += data + '\n';
                             });
@@ -535,7 +582,7 @@ export function finishHotfix(rootDir, baseBranch, hotfixTag, deleteBranch) {
                                     return;
                                 }
                 
-                                let ls6 = spawn(gitExecutable, ['merge', '--no-ff', currentBranch], options);
+                                let ls6 = spawn(gitExecutable, ['merge', '--no-ff', currentBranch], gitOptions);
                                 ls6.stdout.on('data', function (data) {
                                     log += data + '\n';
                                 });
@@ -543,8 +590,12 @@ export function finishHotfix(rootDir, baseBranch, hotfixTag, deleteBranch) {
                                     error += data;
                                 });
                                 ls6.on('exit', function (code) {
+                                    if(code > 0) {
+                                        reject(error);
+                                        return;
+                                    }
                                     if(deleteBranch) {
-                                        let ls6 = spawn(gitExecutable, ['branch', '-d', currentBranch], options);
+                                        let ls6 = spawn(gitExecutable, ['branch', '-d', currentBranch], gitOptions);
                                         ls6.stdout.on('data', function (data) {
                                             log += data + '\n';
                                         });
@@ -564,10 +615,6 @@ export function finishHotfix(rootDir, baseBranch, hotfixTag, deleteBranch) {
                                         });
                                     }
                                     else {
-                                        if(code > 0) {
-                                            reject(error);
-                                            return;
-                                        }
                                         var message = log;
                                         if(code === 0 && error.length > 0)
                                             message += '\n\n' + error;

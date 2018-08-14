@@ -2,13 +2,14 @@
 
 export class BranchSetting {
 
-    constructor(name: string, base: string, pushAfterFinishing: boolean) {
+    constructor(name: string, base: string, pushAfterFinishing?: boolean) {
         this.name = name;
         this.base = base;
-        this.pushAfterFinishing = pushAfterFinishing;
+        if(pushAfterFinishing)
+            this.pushAfterFinishing = pushAfterFinishing;
     } 
 
     name: string = '';
     base: string = '';
-    pushAfterFinishing: boolean = false;
+    pushAfterFinishing: boolean;
 }

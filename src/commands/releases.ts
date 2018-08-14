@@ -10,7 +10,6 @@ const config = workspace.getConfiguration();
 const initValues = config.get('gitflow4code.init') as InitConfigSettings;
 const askForDeletion = config.get('gitflow4code.askBeforeDeletion') as boolean;
 const deleteByDefault = config.get('gitflow4code.deleteBranchByDefault') as boolean;
-const pushAfterFinishing = config.get('gitflow4code.pushAfterFinishing') as boolean;
 
 export function run(outChannel, action) {
     if(action === 'start') {
@@ -35,10 +34,7 @@ export function run(outChannel, action) {
                 gitUtils.getBranchList(workspace.rootPath).then((releases) => {
                     var branchPickList = [];
                     releases.forEach(branchName => {
-                        if(branchName === initValues.develop)
-                            branchPickList.push( { label: initValues.develop, description: 'create release branch using ' + initValues.develop + ' as your base'});
-                        else
-                            branchPickList.push( { label: branchName, description: 'create release branch using ' + branchName + ' as your base'});
+                        branchPickList.push( { label: branchName, description: 'create release branch using ' + branchName + ' as your base'});
                     });
                 
                     vscode.window.showQuickPick(branchPickList).then(function(item) {
@@ -87,7 +83,7 @@ function startRelease(outChannel, releaseName, baseBranch) {
         }
 
         let releasesConfig = config.get('gitflow4code.releases') as BranchSetting[];
-        releasesConfig.push(new BranchSetting(initValues.releases + releaseName, baseBranch, pushAfterFinishing));
+        releasesConfig.push(new BranchSetting(initValues.releases + releaseName, baseBranch));
         config.update('gitflow4code.releases', releasesConfig);
         
         outChannel.append(log);
@@ -110,8 +106,8 @@ function finishRelease(outChannel, releaseTag, deleteBranch) {
             let releasesConfig = config.get('gitflow4code.releases') as BranchSetting[];
             let releaseSetting = releasesConfig.find((release) => release.name === branchName.toString());
             if(!releaseSetting)
-                releaseSetting = new BranchSetting(branchName.toString(), initValues.develop, pushAfterFinishing);
-            
+                releaseSetting = new BranchSetting(branchName.toString(), initValues.develop);
+
             gitflowUtils.finishRelease(gitRepositoryPath, releaseSetting.base, releaseTag, deleteBranch).then(finishRelease, genericErrorHandler);
             function finishRelease(log) {
                 if(log.length === 0) {
