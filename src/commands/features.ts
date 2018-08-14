@@ -8,8 +8,9 @@ import { BranchSetting } from '../settings/branchSettings';
 
 const config = workspace.getConfiguration(); 
 const initValues = config.get('gitflow4code.init') as InitConfigSettings;
-const askForDeletion = config.get('gitflow4code.askBeforeDeletion') as Boolean;
-const deleteByDefault = config.get('gitflow4code.deleteBranchByDefault') as Boolean;
+const askForDeletion = config.get('gitflow4code.askBeforeDeletion') as boolean;
+const deleteByDefault = config.get('gitflow4code.deleteBranchByDefault') as boolean;
+const pushAfterFinishing = config.get('gitflow4code.pushAfterFinishing') as boolean;
 
 export function run(outChannel, action) {
     if(action === 'start') {
@@ -34,10 +35,7 @@ export function run(outChannel, action) {
                 gitUtils.getBranchList(workspace.rootPath).then((features) => {
                     var branchPickList = [];
                     features.forEach(branchName => {
-                        if(branchName === initValues.develop)
-                            branchPickList.push( { label: initValues.develop, description: 'create feature branch using ' + initValues.develop + ' as your base'});
-                        else
-                            branchPickList.push( { label: branchName, description: 'create feature branch using ' + branchName + ' as your base'});
+                        branchPickList.push( { label: branchName, description: 'create feature branch using ' + branchName + ' as your base'});
                     });
                 
                     vscode.window.showQuickPick(branchPickList).then(function(item) {
@@ -83,7 +81,7 @@ function startFeature(outChannel, featureName, baseBranch) {
         }
 
         let featuresConfig = config.get('gitflow4code.features') as BranchSetting[];
-        featuresConfig.push(new BranchSetting(initValues.features + featureName, baseBranch));
+        featuresConfig.push(new BranchSetting(initValues.features + featureName, baseBranch, pushAfterFinishing));
         config.update('gitflow4code.features', featuresConfig);
         
         outChannel.append(log);
@@ -107,9 +105,12 @@ function finishFeature(outChannel, deleteBranch) {
                 let featuresConfig = config.get('gitflow4code.features') as BranchSetting[];
                 let featureSetting = featuresConfig.find((feature) => feature.name === branchName.toString());
                 if(!featureSetting) 
-                    featureSetting = new BranchSetting(branchName.toString(), initValues.develop);
+                    featureSetting = new BranchSetting(branchName.toString(), initValues.develop, pushAfterFinishing);
 
-                gitflowUtils.finishFeature(gitRepositoryPath, branchName.toString(), featureSetting.base, deleteBranch).then(finishFeature, genericErrorHandler);
+                let options = {
+                    pushToOrigin: pushAfterFinishing
+                };
+                gitflowUtils.finishFeature(gitRepositoryPath, branchName.toString(), featureSetting.base, deleteBranch, options).then(finishFeature, genericErrorHandler);
                 function finishFeature(log) {
                     if(log.length === 0) {
                         vscode.window.showInformationMessage('Nothing to show');

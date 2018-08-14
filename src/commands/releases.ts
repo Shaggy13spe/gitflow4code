@@ -8,8 +8,8 @@ import { BranchSetting } from '../settings/branchSettings';
 
 const config = workspace.getConfiguration();
 const initValues = config.get('gitflow4code.init') as InitConfigSettings;
-const askForDeletion = config.get('gitflow4code.askBeforeDeletion') as Boolean;
-const deleteByDefault = config.get('gitflow4code.deleteBranchByDefault') as Boolean;
+const askForDeletion = config.get('gitflow4code.askBeforeDeletion') as boolean;
+const deleteByDefault = config.get('gitflow4code.deleteBranchByDefault') as boolean;
 
 export function run(outChannel, action) {
     if(action === 'start') {
@@ -34,10 +34,7 @@ export function run(outChannel, action) {
                 gitUtils.getBranchList(workspace.rootPath).then((releases) => {
                     var branchPickList = [];
                     releases.forEach(branchName => {
-                        if(branchName === initValues.develop)
-                            branchPickList.push( { label: initValues.develop, description: 'create release branch using ' + initValues.develop + ' as your base'});
-                        else
-                            branchPickList.push( { label: branchName, description: 'create release branch using ' + branchName + ' as your base'});
+                        branchPickList.push( { label: branchName, description: 'create release branch using ' + branchName + ' as your base'});
                     });
                 
                     vscode.window.showQuickPick(branchPickList).then(function(item) {
@@ -110,7 +107,7 @@ function finishRelease(outChannel, releaseTag, deleteBranch) {
             let releaseSetting = releasesConfig.find((release) => release.name === branchName.toString());
             if(!releaseSetting)
                 releaseSetting = new BranchSetting(branchName.toString(), initValues.develop);
-            
+
             gitflowUtils.finishRelease(gitRepositoryPath, releaseSetting.base, releaseTag, deleteBranch).then(finishRelease, genericErrorHandler);
             function finishRelease(log) {
                 if(log.length === 0) {
