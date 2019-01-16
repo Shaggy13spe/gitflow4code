@@ -4,41 +4,41 @@ import { workspace, window, commands, extensions } from 'vscode';
 import * as path from 'path';
 import * as child_process_1 from 'child_process';
 import * as fs from 'fs';
+import { Git } from '../git/git';
 
-const api = extensions.getExtension('vscode.git').exports;
+let git: Git;
 
 export function getGitRepositoryPath(fileName) {
     fileName += '/.';
-    return api.getGitPath().then(function (gitExecutable) {
-        return new Promise(function (resolve, reject) {
-            let options = { cwd: path.dirname(fileName) };
-            let util = require('util');
-            let spawn = require('child_process').spawn;
-            let ls = spawn(gitExecutable, ['rev-parse', '--git-dir'], options);
-            let log = '';
-            let error = '';
-            ls.stdout.on('data', function (data) {
-                log =+ data + '\n';
-            });
-            ls.stderr.on('data', function (data) {
-                error += data;
-            });
-            ls.on('exit', function (code) {
-                if(error.length > 0) {
-                    reject(error);
-                    return;
-                }
-                if(path.dirname(log) === '.') {
-                    log = path.dirname(fileName) + '/' + log;
-                }
-                resolve(path.dirname(log));
-            });
-        }); 
-    });
+    let gitPath = git.getGitInfo().path;
+    return new Promise(function (resolve, reject) {
+        let options = { cwd: path.dirname(fileName) };
+        let util = require('util');
+        let spawn = require('child_process').spawn;
+        let ls = spawn(gitPath, ['rev-parse', '--git-dir'], options);
+        let log = '';
+        let error = '';
+        ls.stdout.on('data', function (data) {
+            log =+ data + '\n';
+        });
+        ls.stderr.on('data', function (data) {
+            error += data;
+        });
+        ls.on('exit', function (code) {
+            if(error.length > 0) {
+                reject(error);
+                return;
+            }
+            if(path.dirname(log) === '.') {
+                log = path.dirname(fileName) + '/' + log;
+            }
+            resolve(path.dirname(log));
+        });
+    }); 
 }
 
 export function getStatus(rootDir) {
-    return api.getGitPath().then(function (gitExecutable) {
+    return gitExtension.getGitPath().then(function (gitExecutable) {
         return new Promise(function (resolve, reject) {
             let options = { cwd: rootDir };
             let util = require('util');
@@ -64,7 +64,7 @@ export function getStatus(rootDir) {
 }
 
 export function getCurrentBranchName(rootDir) {
-    return api.getGitPath().then((gitExecutable) => {
+    return gitExtension.getGitPath().then((gitExecutable) => {
         return new Promise(function (resolve, reject) {
             var options = { cwd: rootDir };
             var util = require('util');
@@ -90,7 +90,7 @@ export function getCurrentBranchName(rootDir) {
 }
 
 export function checkForBranch(rootDir, branchName) {
-    return api.getGitPath().then(function (gitExecutable) {
+    return gitExtension.getGitPath().then(function (gitExecutable) {
         return new Promise(function (resolve, reject) {
             let options = { cwd: rootDir };
             let spawn = require('child_process').spawn;
@@ -104,7 +104,7 @@ export function checkForBranch(rootDir, branchName) {
 
 export function getBranchList(fileName) {
     return getGitRepositoryPath(fileName).then((rootDir) => {
-        return api.getGitPath().then(function (gitExecutable) {
+        return gitExtension.getGitPath().then(function (gitExecutable) {
             return new Promise(function (resolve, reject) {
                 let options = { cwd: rootDir };
                 let util = require('util');

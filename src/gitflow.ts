@@ -2,7 +2,7 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
-import { workspace, window, commands, extensions, Disposable } from 'vscode';
+import { workspace, window, commands, Disposable, ExtensionContext, StatusBarItem, StatusBarAlignment } from 'vscode';
 import * as initCommands from './commands/init';
 import * as featureCommands from './commands/features';
 import * as releaseCommands from './commands/releases';
@@ -11,13 +11,13 @@ import * as gitCommands from './commands/gitCommands';
 import { InitConfigSettings } from './settings/configSettings';
 import { getCurrentBranchName } from '../src/helpers/gitUtils';
 import { toDisposable } from './util';
+import { GitService } from './gitService';
 
 const config = workspace.getConfiguration(); 
-const api = extensions.getExtension('vscode.git').exports;
 const initValues = config.get('gitflow4code.init') as InitConfigSettings;
 const showStatusBarFinisher = config.get('gitflow4code.showStatusBarFinisher') as boolean;
 
-async function init(context: vscode.ExtensionContext, disposables: Disposable[]): Promise<void> {
+async function init(context: ExtensionContext, disposables: Disposable[]): Promise<void> {
     const outChannel = window.createOutputChannel('GitFlow4Code');
     disposables.push(outChannel);
 
@@ -26,14 +26,14 @@ async function init(context: vscode.ExtensionContext, disposables: Disposable[])
         context.subscriptions.push(statusFinisher);
     }
 
-    let initializeCommand = vscode.commands.registerCommand('gitflow.initialize', () => { initCommands.run(outChannel); });
-    let startFeatureCommand = vscode.commands.registerCommand('gitflow.startFeature', () => { featureCommands.run(outChannel, 'start'); });
-    let finishFeatureCommand = vscode.commands.registerCommand('gitflow.finishFeature', () => { featureCommands.run(outChannel, 'finish'); });
-    let startReleaseCommand = vscode.commands.registerCommand('gitflow.startRelease', () => { releaseCommands.run(outChannel, 'start'); });
-    let finishReleaseCommand = vscode.commands.registerCommand('gitflow.finishRelease', () => { releaseCommands.run(outChannel, 'finish'); });
-    let startHotfixCommand = vscode.commands.registerCommand('gitflow.startHotfix', () => { hotfixCommands.run(outChannel, 'start'); });
-    let releaseHotfixCommand = vscode.commands.registerCommand('gitflow.finishHotfix', () => { hotfixCommands.run(outChannel, 'finish'); });
-    let gitStatusCommand = vscode.commands.registerCommand('gitflow.gitStatus', () => { gitCommands.run(outChannel); });
+    let initializeCommand = commands.registerCommand('gitflow.initialize', () => { initCommands.run(outChannel); });
+    let startFeatureCommand = commands.registerCommand('gitflow.startFeature', () => { featureCommands.run(outChannel, 'start'); });
+    let finishFeatureCommand = commands.registerCommand('gitflow.finishFeature', () => { featureCommands.run(outChannel, 'finish'); });
+    let startReleaseCommand = commands.registerCommand('gitflow.startRelease', () => { releaseCommands.run(outChannel, 'start'); });
+    let finishReleaseCommand = commands.registerCommand('gitflow.finishRelease', () => { releaseCommands.run(outChannel, 'finish'); });
+    let startHotfixCommand = commands.registerCommand('gitflow.startHotfix', () => { hotfixCommands.run(outChannel, 'start'); });
+    let releaseHotfixCommand = commands.registerCommand('gitflow.finishHotfix', () => { hotfixCommands.run(outChannel, 'finish'); });
+    let gitStatusCommand = commands.registerCommand('gitflow.gitStatus', () => { gitCommands.run(outChannel); });
 
     context.subscriptions.push(initializeCommand);
     context.subscriptions.push(startFeatureCommand);
@@ -43,12 +43,14 @@ async function init(context: vscode.ExtensionContext, disposables: Disposable[])
     context.subscriptions.push(startHotfixCommand);
     context.subscriptions.push(releaseHotfixCommand);
     context.subscriptions.push(gitStatusCommand);
+
+    await GitService.initialize();
     
 }
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
-export function activate(context: vscode.ExtensionContext): any {
+export function activate(context: ExtensionContext): any {
     const disposables: Disposable[] = [];
     context.subscriptions.push(new Disposable(() => Disposable.from(...disposables).dispose()));
 
@@ -56,7 +58,7 @@ export function activate(context: vscode.ExtensionContext): any {
 
     if(showStatusBarFinisher){
         let statusFinisher = new FinishStatusItem();
-        getCurrentBranchName(vscode.workspace.rootPath).then((branchName) => {
+        getCurrentBranchName(workspace.rootPath).then((branchName) => {
             if(branchName.toString().startsWith(initValues.features)
                 || branchName.toString().startsWith(initValues.releases)
                 || branchName.toString().startsWith(initValues.hotfixes)) {
@@ -72,7 +74,7 @@ export function activate(context: vscode.ExtensionContext): any {
         const watcher = workspace.createFileSystemWatcher('**/.git/HEAD'); 
 
         watcher.onDidChange(() => {
-            getCurrentBranchName(vscode.workspace.rootPath).then((branchName) => {
+            getCurrentBranchName(workspace.rootPath).then((branchName) => {
                 if(branchName.toString().startsWith(initValues.features)
                     || branchName.toString().startsWith(initValues.releases)
                     || branchName.toString().startsWith(initValues.hotfixes)) {
@@ -87,11 +89,11 @@ export function activate(context: vscode.ExtensionContext): any {
 }
 
 class FinishStatusItem {
-    private _statusBarItem: vscode.StatusBarItem;
+    private _statusBarItem: StatusBarItem;
 
     public showStatusItem(branchName) {
         if(!this._statusBarItem)
-            this._statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
+            this._statusBarItem = window.createStatusBarItem(StatusBarAlignment.Left);
              
         this._statusBarItem.text = '$(git-merge) Finish ' + branchName;
 
@@ -118,5 +120,4 @@ class FinishStatusItem {
 }
 
 // this method is called when your extension is deactivated
-export function deactivate() {
-}
+export function deactivate() {}
