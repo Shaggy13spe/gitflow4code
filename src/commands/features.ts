@@ -26,7 +26,7 @@ export function run(outChannel, action) {
         ];
         
         vscode.window.showQuickPick(itemPickList).then(function(item) {
-            if(!item) return;
+            if(!item) return; //test
             
             outChannel.clear();
             if(item.label === itemPickList[0].label) 
